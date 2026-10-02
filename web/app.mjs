@@ -1,4 +1,4 @@
-import {currency_name, search_cycles, quote_recipe} from './core.mjs?v=gold-fees-v1';
+import {currency_name, search_cycles, quote_recipe} from './core.mjs?v=stock-threshold-v1';
 
 const by_id = id => document.getElementById(id);
 const format_number = value => new Intl.NumberFormat(undefined, {maximumFractionDigits: 2}).format(value);
@@ -22,11 +22,12 @@ function set_error(message) {
 
 function read_options() {
   if (!by_id('controls').checkValidity()) throw new Error('Enter valid numbers in each field.');
-  const options = {max_trades: Number(by_id('max_trades').value), start: by_id('start').value, budget: Number(by_id('budget').value), haircut_bps: Math.round(Number(by_id('haircut').value) * 100), min_volume: Number(by_id('min_volume').value), min_profit: Number(by_id('min_profit').value), include_vendors: by_id('route_type').value !== 'market', vendor_only: by_id('route_type').value === 'vendor'};
+  const options = {max_trades: Number(by_id('max_trades').value), start: by_id('start').value, budget: Number(by_id('budget').value), haircut_bps: Math.round(Number(by_id('haircut').value) * 100), min_stock: Number(by_id('min_stock').value), min_volume: Number(by_id('min_volume').value), min_profit: Number(by_id('min_profit').value), include_vendors: by_id('route_type').value !== 'market', vendor_only: by_id('route_type').value === 'vendor'};
   options.gold_budget = by_id('gold_budget').value === '' ? null : Number(by_id('gold_budget').value);
   options.sort_by = by_id('sort_by').value;
   options.gold_fees = fee_catalog.items;
   if (!Number.isSafeInteger(options.min_volume) || options.min_volume < 1) throw new Error('Minimum volume must be a positive whole number.');
+  if (!Number.isSafeInteger(options.min_stock) || options.min_stock < 1) throw new Error('Minimum historical stock must be a positive whole number.');
   return options;
 }
 
@@ -120,7 +121,7 @@ function render() {
       finish_render(league, search_cycles(league, options));
       return;
     }
-    const worker = new Worker('./search_worker.mjs?v=gold-fees-v1', {type: 'module'});
+    const worker = new Worker('./search_worker.mjs?v=stock-threshold-v1', {type: 'module'});
     search_worker = worker;
     worker.onmessage = ({data}) => {
       if (search_worker !== worker) return;
@@ -205,7 +206,7 @@ function render_recipe() {
     if (!by_id('recipe_controls').checkValidity()) throw new Error('Enter a valid whole number of batches.');
     const league = analysis.leagues.find(league => league.name === by_id('league').value);
     const options = read_options();
-    const result = quote_recipe(recipe, league.edges ?? [], Number(by_id('recipe_batches').value), 0, options.haircut_bps, fee_catalog.items);
+    const result = quote_recipe(recipe, league.edges ?? [], Number(by_id('recipe_batches').value), 0, options.haircut_bps, fee_catalog.items, options.min_stock);
     by_id('recipe_result').textContent = `Cost: ${format_number(result.cost)} chaos. Return: ${format_number(result.returned)} chaos. Profit: ${format_number(result.profit)} chaos (${result.profit_pct === null ? 'percentage undefined for zero cost' : format_pct(result.profit_pct)}). Estimated gold: ${format_gold(result.gold.total)}. ${gold_efficiency_text(result.gold, 'Chaos Orb')}. ${result.gold.missing.length ? `Missing fees: ${result.gold.missing.map(currency_name).join(', ')}. ` : ''}${options.gold_budget !== null && (result.gold.total === null || result.gold.total > options.gold_budget) ? 'This recipe does not meet your gold budget. ' : ''}Direct historical quotes with haircut and whole-unit rounding; one listing per market quote, time excluded.`;
     by_id('recipe_result').className = result.profit >= 0 ? 'positive' : 'negative';
   } catch (error) {
@@ -219,7 +220,7 @@ by_id('recipe').addEventListener('change', select_recipe);
 for (const id of ['recipe_batches']) by_id(id).addEventListener('input', render_recipe);
 by_id('controls').addEventListener('submit', event => event.preventDefault());
 by_id('league').addEventListener('change', () => {update_currencies(); render();});
-for (const id of ['start', 'budget', 'haircut', 'min_profit', 'min_volume', 'max_trades', 'route_type', 'gold_budget', 'sort_by']) by_id(id).addEventListener('input', render);
+for (const id of ['start', 'budget', 'haircut', 'min_profit', 'min_volume', 'min_stock', 'max_trades', 'route_type', 'gold_budget', 'sort_by']) by_id(id).addEventListener('input', render);
 by_id('rows').addEventListener('click', event => {
   const button = event.target.closest('button[data-cycle]');
   if (button) {show_details(Number(button.dataset.cycle)); by_id('details').scrollIntoView({behavior:'smooth', block:'start'});}
