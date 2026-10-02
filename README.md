@@ -86,6 +86,12 @@ The recipe calculator buys each currency ingredient with Chaos Orbs using a dire
 
 The catalogue contains 16 fixed exchanges and two currency baskets: Fusing plus Chromatic to Jeweller, and the Mirror sale with multiple currency rewards. Equipment, gem, flask, quest-item and map recipes, random exchanges, retired recipes and unused references are excluded. Quoted adjacent essence upgrades remain in the scanner. Each catalogue entry links its rate reference and the 3.29 patch notes. The review checks documented rates against patch changes; it is not an in-game verification. [GGG removed Jeweller’s-to-Chromatic purchases in 3.29](https://www.pathofexile.com/forum/view-thread/3985332), so that exchange is excluded.
 
+## Manual market prices
+
+The Manual Chaos prices panel accepts separate buying and selling quotes for common crafting currencies and scrolls. Enter the amounts given and received, then choose Apply prices and search to scan the full graph with those rates. Leave both amounts blank to retain the snapshot quote for that direction. No reciprocal quote is inferred. Reset restores historical prices. Applied quotes are kept separately for each league during the page session.
+
+Only existing market pairs can be edited. Their historical stock and hourly volume remain unchanged for filters and context; the entered amounts set the conversion ratio, not the observed liquidity. Vendor rates and unedited pairs stay fixed. Search balances, profit, gold, clicks and recipe estimates use the applied prices, haircut and rounding. Results mark cycles that include manual prices; historical ranges continue to describe the original snapshot. Inspector edits affect only that cycle and reset to the applied search rates.
+
 ## Click efficiency
 
 The browser estimates one click for each Faustus market leg with a nonzero input. A vendor leg requires `floor(input_amount / input_batch)` clicks, one for each completed recipe batch, even when the batch returns multiple items. Leftovers add no clicks. Total clicks include the closing trade, and profit per click is `(ending_balance - starting_balance) / total_clicks` in the selected starting currency. Losses have negative efficiency; zero clicks leave it undefined. Setup, inventory movement, travel, cancellations and reposting are excluded from this model.
