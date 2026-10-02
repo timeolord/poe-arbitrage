@@ -29,3 +29,25 @@ test('filters reject insufficient volume on either side', () => {
   assert.equal(rank_cycles({cycles:[cycle]}, {...options, min_volume:2}).length, 0);
   assert.equal(rank_cycles({cycles:[cycle]}, {...options, min_profit:17}).length, 0);
 });
+
+test('vendor batch rounding precedes reward and ignores haircut', () => {
+  const vendor = {...leg('a','b',8,20), kind:'vendor'};
+  const result = simulate_cycle([vendor], 25, 500);
+  assert.equal(result.end, 60);
+  assert.deepEqual(result.leftovers, [1]);
+  const mixed = {path:['a','b'], legs:[vendor, {...leg('b','a',20,10),kind:'market'}], profit_pct:25};
+  assert.equal(rank_cycles({cycles:[mixed]}, {start:'a',budget:25,haircut_bps:0,min_volume:10,min_profit:1}).length, 1);
+  assert.equal(rank_cycles({cycles:[mixed]}, {start:'a',budget:25,haircut_bps:0,min_volume:10,min_profit:1,include_vendors:false}).length, 0);
+});
+
+test('recipe basket values every input and output and rejects missing quotes', async () => {
+  const {quote_recipe} = await import('../web/core.mjs');
+  const chaos = 'Metadata/Items/Currency/CurrencyRerollRare';
+  const edges = [{...leg(chaos,'a',3,2),kind:'market'}, {...leg('b',chaos,2,7),kind:'market'}, {...leg('c',chaos,1,3),kind:'market'}];
+  const recipe = {kind:'item', inputs:{a:3}, outputs:{b:3,c:1}};
+  assert.deepEqual(quote_recipe(recipe,edges,1,2,0), {cost:7,returned:13,profit:6,profit_pct:(13/7-1)*100});
+  assert.equal(quote_recipe(recipe,edges,1,2,1000).cost, 7);
+  assert.equal(quote_recipe(recipe,edges,1,2,1000).returned, 11);
+  assert.throws(() => quote_recipe(recipe,edges.slice(0,2),1,2,0), /Missing direct Chaos/);
+  assert.throws(() => quote_recipe({...recipe,kind:'random'},edges,1,2,0), /no deterministic/);
+});

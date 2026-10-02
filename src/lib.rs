@@ -24,6 +24,9 @@ pub struct Market {
 
 #[derive(Clone, Debug, Serialize)]
 pub struct Edge {
+    pub kind: String,
+    pub vendor: Option<String>,
+    pub recipe_id: Option<String>,
     pub from: String,
     pub to: String,
     pub input_volume: u64,
@@ -51,6 +54,7 @@ pub struct League {
     pub active_pairs: usize,
     pub skipped_pairs: usize,
     pub cycles: Vec<Cycle>,
+    pub edges: Vec<Edge>,
 }
 
 #[derive(Debug, Serialize)]
@@ -80,6 +84,9 @@ pub fn make_edge(market: &Market, from: &str, to: &str) -> Option<Edge> {
         return None;
     }
     Some(Edge {
+        kind: "market".into(),
+        vendor: None,
+        recipe_id: None,
         from: from.to_owned(),
         to: to.to_owned(),
         input_volume: market.volume_traded[from],
@@ -104,6 +111,10 @@ pub fn simulate_cycle(legs: &[Edge], budget: u64, haircut_pct: u64) -> Option<u6
         if leg.input_volume == 0 || leg.output_volume == 0 {
             return None;
         }
+        if leg.kind == "vendor" {
+            return u64::try_from((amount / leg.input_volume) as u128 * leg.output_volume as u128)
+                .ok();
+        }
         let output = (amount as u128)
             .checked_mul(leg.output_volume as u128)?
             .checked_mul((100 - haircut_pct) as u128)?
@@ -112,12 +123,109 @@ pub fn simulate_cycle(legs: &[Edge], budget: u64, haircut_pct: u64) -> Option<u6
     })
 }
 
+#[derive(Deserialize)]
+struct VendorCatalog {
+    recipes: Vec<VendorRecipe>,
+}
+#[derive(Deserialize)]
+struct VendorRecipe {
+    id: String,
+    kind: String,
+    vendor: String,
+    inputs: BTreeMap<String, u64>,
+    outputs: BTreeMap<String, u64>,
+}
+
+fn add_vendor_edges(graph: &mut BTreeMap<String, Vec<Edge>>) {
+    let catalog: VendorCatalog = serde_json::from_str(include_str!("../web/vendor_recipes.json"))
+        .expect("valid vendor catalogue");
+    let mut recipes: Vec<_> = catalog
+        .recipes
+        .into_iter()
+        .filter(|r| r.kind == "fixed")
+        .collect();
+    for from in graph.keys() {
+        let suffix = from.rsplit('/').next().unwrap_or(from);
+        if suffix.starts_with("CurrencyEssence") {
+            if let Some(tier) = suffix.chars().last().and_then(|c| c.to_digit(10)) {
+                let to = format!("{}{}", &from[..from.len() - 1], tier + 1);
+                if graph.contains_key(&to) {
+                    recipes.push(VendorRecipe {
+                        id: format!("upgrade_{suffix}"),
+                        kind: "fixed".into(),
+                        vendor: "Any town vendor, three matching essences".into(),
+                        inputs: BTreeMap::from([(from.clone(), 3)]),
+                        outputs: BTreeMap::from([(to, 1)]),
+                    });
+                }
+            }
+        }
+    }
+    for recipe in recipes {
+        let (from, input) = recipe.inputs.into_iter().next().expect("vendor input");
+        let (to, output) = recipe.outputs.into_iter().next().expect("vendor output");
+        if !graph.contains_key(&from) || !graph.contains_key(&to) {
+            continue;
+        }
+        let rate = output as f64 / input as f64;
+        graph.get_mut(&from).unwrap().push(Edge {
+            from,
+            to,
+            input_volume: input,
+            output_volume: output,
+            rate,
+            low_rate: rate,
+            high_rate: rate,
+            historical_low_stock: 0,
+            historical_high_stock: 0,
+            kind: "vendor".into(),
+            vendor: Some(recipe.vendor),
+            recipe_id: Some(recipe.id),
+        });
+    }
+}
+
+fn find_cycles(
+    graph: &BTreeMap<String, Vec<Edge>>,
+    start: &str,
+    path: &mut Vec<String>,
+    legs: &mut Vec<Edge>,
+    cycles: &mut Vec<Cycle>,
+) {
+    for edge in &graph[path.last().unwrap()] {
+        let has_vendor = edge.kind == "vendor" || legs.iter().any(|e| e.kind == "vendor");
+        if edge.to == start && legs.len() >= 1 {
+            let length = legs.len() + 1;
+            if (!has_vendor && length != 3)
+                || (edge.kind != "market" && !legs.iter().any(|e| e.kind == "market"))
+            {
+                continue;
+            }
+            legs.push(edge.clone());
+            cycles.push(Cycle {
+                path: path.clone(),
+                profit_pct: cycle_profit(legs.iter().map(|e| e.rate)),
+                low_profit_pct: cycle_profit(legs.iter().map(|e| e.low_rate)),
+                high_profit_pct: cycle_profit(legs.iter().map(|e| e.high_rate)),
+                legs: legs.clone(),
+            });
+            legs.pop();
+        } else if edge.to.as_str() > start && !path.contains(&edge.to) && path.len() < 4 {
+            path.push(edge.to.clone());
+            legs.push(edge.clone());
+            find_cycles(graph, start, path, legs, cycles);
+            legs.pop();
+            path.pop();
+        }
+    }
+}
+
 pub fn analyze(snapshot: &Snapshot) -> Analysis {
     let names: BTreeSet<_> = snapshot.markets.iter().map(|m| m.league.clone()).collect();
     let leagues = names
         .into_iter()
         .map(|name| {
-            let mut graph = BTreeMap::<String, BTreeMap<String, Edge>>::new();
+            let mut graph = BTreeMap::<String, Vec<Edge>>::new();
             let mut active_pairs = 0;
             let mut skipped_pairs = 0;
             for market in snapshot.markets.iter().filter(|m| m.league == name) {
@@ -133,38 +241,26 @@ pub fn analyze(snapshot: &Snapshot) -> Analysis {
                 let b = &market.market_pair[1];
                 match (make_edge(market, a, b), make_edge(market, b, a)) {
                     (Some(forward), Some(reverse)) if a != b => {
-                        graph
-                            .entry(a.clone())
-                            .or_default()
-                            .insert(b.clone(), forward);
-                        graph
-                            .entry(b.clone())
-                            .or_default()
-                            .insert(a.clone(), reverse);
+                        graph.entry(a.clone()).or_default().push(forward);
+                        graph.entry(b.clone()).or_default().push(reverse);
                         active_pairs += 1;
                     }
                     _ => skipped_pairs += 1,
                 }
             }
+            if !name.contains("Ruthless") {
+                add_vendor_edges(&mut graph);
+            }
+            let edges: Vec<_> = graph.values().flatten().cloned().collect();
             let mut cycles = Vec::new();
-            for (a, neighbors) in &graph {
-                for (b, ab) in neighbors {
-                    for (c, bc) in &graph[b] {
-                        if c == a || a > b || a > c {
-                            continue;
-                        }
-                        if let Some(ca) = graph[c].get(a) {
-                            let legs = vec![ab.clone(), bc.clone(), ca.clone()];
-                            cycles.push(Cycle {
-                                path: vec![a.clone(), b.clone(), c.clone()],
-                                profit_pct: cycle_profit(legs.iter().map(|e| e.rate)),
-                                low_profit_pct: cycle_profit(legs.iter().map(|e| e.low_rate)),
-                                high_profit_pct: cycle_profit(legs.iter().map(|e| e.high_rate)),
-                                legs,
-                            });
-                        }
-                    }
-                }
+            for a in graph.keys() {
+                find_cycles(
+                    &graph,
+                    a,
+                    &mut vec![a.clone()],
+                    &mut Vec::new(),
+                    &mut cycles,
+                );
             }
             cycles.sort_by(|a, b| b.profit_pct.total_cmp(&a.profit_pct));
             League {
@@ -173,6 +269,7 @@ pub fn analyze(snapshot: &Snapshot) -> Analysis {
                 active_pairs,
                 skipped_pairs,
                 cycles,
+                edges,
             }
         })
         .collect();
@@ -192,6 +289,9 @@ mod tests {
     use super::*;
     fn edge(input_volume: u64, output_volume: u64) -> Edge {
         Edge {
+            kind: "market".into(),
+            vendor: None,
+            recipe_id: None,
             from: "a".into(),
             to: "b".into(),
             input_volume,
@@ -216,6 +316,42 @@ mod tests {
         assert_eq!(simulate_cycle(&[edge(3, 1)], 2, 0), Some(0));
         assert_eq!(simulate_cycle(&legs, 100, 100), None);
         assert_eq!(simulate_cycle(&[edge(0, 1)], 100, 0), None);
+    }
+    #[test]
+    fn vendor_batches_have_no_haircut() {
+        let mut vendor = edge(8, 20);
+        vendor.kind = "vendor".into();
+        assert_eq!(simulate_cycle(&[vendor], 25, 5), Some(60));
+    }
+    #[test]
+    fn parallel_vendor_edges_create_mixed_cycles() {
+        let a = "Metadata/Items/Currency/CurrencyIdentification".to_string();
+        let b = "Metadata/Items/Currency/CurrencyPortal".to_string();
+        let mut market = edge(1, 2);
+        market.from = a.clone();
+        market.to = b.clone();
+        let mut reverse = edge(2, 1);
+        reverse.from = b.clone();
+        reverse.to = a.clone();
+        let mut graph = BTreeMap::from([(a.clone(), vec![market]), (b.clone(), vec![reverse])]);
+        add_vendor_edges(&mut graph);
+        assert_eq!(graph[&a].len(), 2);
+        assert_eq!(graph[&b].len(), 2);
+        let mut cycles = Vec::new();
+        find_cycles(
+            &graph,
+            &a,
+            &mut vec![a.clone()],
+            &mut Vec::new(),
+            &mut cycles,
+        );
+        assert_eq!(cycles.len(), 2);
+        assert!(cycles
+            .iter()
+            .all(|c| c.legs.iter().filter(|e| e.kind == "vendor").count() == 1));
+        assert!(cycles
+            .iter()
+            .any(|c| simulate_cycle(&c.legs, 30, 0) == Some(60)));
     }
     #[test]
     fn ignores_zero_volume_and_separates_leagues() {
