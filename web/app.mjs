@@ -1,4 +1,4 @@
-import {currency_name, search_cycles, quote_recipe, manual_cycle} from './core.mjs?v=click-profit-v1';
+import {currency_name, search_cycles, quote_recipe, manual_cycle, apply_market_quotes, common_currencies, chaos_id, historical_volume} from './core.mjs?v=chaos-prices-v1';
 
 const by_id = id => document.getElementById(id);
 const format_number = value => new Intl.NumberFormat(undefined, {maximumFractionDigits: 2}).format(value);
@@ -15,6 +15,32 @@ let ranked = [];
 let page_size = 40;
 let selected_index = null;
 let search_worker;
+const market_quotes = new Map();
+
+function current_league() {
+  const league = analysis.leagues.find(league => league.name === by_id('league').value);
+  return apply_market_quotes(league, market_quotes.get(league.name) ?? []);
+}
+
+function render_market_quotes() {
+  const league = analysis.leagues.find(league => league.name === by_id('league').value);
+  const saved = market_quotes.get(league.name) ?? [];
+  by_id('market_quote_rows').innerHTML = common_currencies.filter(id => league.currencies.includes(id)).map(id => {
+    const quote = saved.find(quote => quote.currency === id);
+    return `<tr><td>${escape_html(currency_name(id))}</td>${['buy', 'sell'].map(direction => {
+      const edge = league.edges.find(edge => edge.kind === 'market' && edge.from === (direction === 'buy' ? chaos_id : id) && edge.to === (direction === 'buy' ? id : chaos_id));
+      return ['input', 'output'].map(side => `<td><input type="text" inputmode="decimal" data-currency="${escape_html(id)}" data-direction="${direction}" data-side="${side}" aria-label="${escape_html(currency_name(id))} ${direction} ${side === 'input' ? 'give' : 'receive'}" value="${escape_html(quote?.[direction]?.[side] ?? '')}" placeholder="${edge ? format_number(edge[`${side}_volume`]) : 'No pair'}" ${edge ? '' : 'disabled'}></td>`).join('');
+    }).join('')}</tr>`;
+  }).join('');
+  by_id('market_quote_error').hidden = true;
+  update_quote_status();
+}
+
+function update_quote_status(pending = false) {
+  const count = current_league().edges.filter(edge => edge.manual_price).length;
+  by_id('market_quote_status').textContent = `${count ? `Search uses ${count} manual directional Chaos quotes; other rates are historical.` : 'Search uses historical prices.'}${pending ? ' Edits pending. Apply prices and search to use them.' : ''}`;
+}
+
 
 function set_error(message) {
   by_id('error').hidden = !message;
@@ -43,7 +69,7 @@ function update_currencies() {
 
 function render_rows() {
   by_id('rows').innerHTML = ranked.slice(0, page_size).map((cycle, index) => `<tr${index === selected_index ? ' class="selected"' : ''}>
-    <td>${route_html(cycle.path)}<span class="secondary">${cycle.legs.filter(leg => leg.kind === 'vendor').length} vendor / ${cycle.legs.filter(leg => leg.kind !== 'vendor').length} market trades</span></td>
+    <td>${route_html(cycle.path)}${cycle.legs.some(leg => leg.manual_price) ? '<span class="secondary">Includes manual prices</span>' : ''}<span class="secondary">${cycle.legs.filter(leg => leg.kind === 'vendor').length} vendor / ${cycle.legs.filter(leg => leg.kind !== 'vendor').length} market trades</span></td>
     <td><span class="profit ${cycle.simulation.profit_pct >= 0 ? 'positive' : 'negative'}">${format_pct(cycle.simulation.profit_pct)}</span><span class="secondary">after rounding &amp; haircut</span></td>
     <td>${format_number(cycle.simulation.end)}</td><td>${cycle.simulation.profit >= 0 ? '+' : ''}${format_number(cycle.simulation.profit)}</td>
     <td>${format_number(cycle.simulation.clicks.total)}<span class="secondary">estimated clicks</span></td>
@@ -67,7 +93,7 @@ function show_details(index, quotes = null) {
   by_id('detail_content').innerHTML = `${route_html(cycle.path)}
     <form id="leg_quotes"><div class="quote-editor"><h3>Check current prices</h3><p>Enter the amounts you give and receive for each market trade. Vendor batches stay fixed. Recalculate uses your starting amount and haircut, with whole-unit rounding and updated gold fees.</p>
     ${historical.legs.map((leg, i) => leg.kind === 'vendor' ? `<p>Trade ${i + 1}: fixed vendor batch, ${format_number(leg.input_volume)} ${escape_html(currency_name(leg.from))} → ${format_number(leg.output_volume)} ${escape_html(currency_name(leg.to))}.</p>` : `<div class="quote-row"><span>Trade ${i + 1}</span><label>Give ${escape_html(currency_name(leg.from))}<input data-quote-input="${i}" aria-label="Trade ${i + 1} give ${escape_html(currency_name(leg.from))}" type="text" inputmode="decimal" value="${escape_html(displayed_quotes[i].input)}" required></label><label>Receive ${escape_html(currency_name(leg.to))}<input data-quote-output="${i}" aria-label="Trade ${i + 1} receive ${escape_html(currency_name(leg.to))}" type="text" inputmode="decimal" value="${escape_html(displayed_quotes[i].output)}" required></label></div>`).join('')}
-    <div class="quote-actions"><button type="submit">Recalculate cycle</button><button id="reset_quotes" type="button">Reset historical rates</button></div><p id="quote_status" role="status">${quotes ? 'Manual price scenario. Historical stock and volume remain context; the search results above use historical prices.' : 'Historical price scenario. Change the quote amounts, then recalculate.'}</p><p id="quote_error" class="error" role="alert" hidden></p></div></form>
+    <div class="quote-actions"><button type="submit">Recalculate cycle</button><button id="reset_quotes" type="button">Reset to search rates</button></div><p id="quote_status" role="status">${quotes ? 'Manual price scenario. Historical stock and volume remain context; the search results above use the applied panel prices.' : 'Search price scenario. Change the quote amounts, then recalculate.'}</p><p id="quote_error" class="error" role="alert" hidden></p></div></form>
     <div class="detail-stats">
     <div><span>Modeled cycle profit</span><strong class="${cycle.simulation.profit_pct >= 0 ? 'positive' : 'negative'}">${format_pct(cycle.simulation.profit_pct)}</strong></div>
     <div><span>Unrounded central return</span><strong>${format_pct(cycle.profit_pct)}</strong></div>
@@ -83,13 +109,13 @@ function show_details(index, quotes = null) {
       <td>${format_number(cycle.simulation.amounts[i])} → ${format_number(cycle.simulation.amounts[i + 1])}${cycle.simulation.leftovers[i] ? `<span class="secondary">${cycle.simulation.leftovers[i]} input left over, excluded</span>` : ''}</td>
       <td>${format_number(cycle.simulation.clicks.leg_counts[i])}<span class="secondary">${leg.kind === 'vendor' ? 'One click per completed batch' : 'One Faustus trade'}</span></td>
       <td>${format_gold(cycle.simulation.gold.leg_costs[i])}<span class="secondary">${leg.kind === 'vendor' ? 'No exchange fee' : 'Fee on received currency'}</span></td>
-      <td>${leg.rate.toPrecision(6)} per input unit<span class="secondary">${quotes && leg.kind !== 'vendor' ? 'Manual quote' : 'Historical average'}; historical ${leg.low_rate.toPrecision(5)} to ${leg.high_rate.toPrecision(5)}</span></td>
-      <td>${leg.kind === 'vendor' ? 'Fixed batch: ' : 'Hourly: '}${format_number(historical.legs[i].input_volume)} input / ${format_number(historical.legs[i].output_volume)} output</td>
+      <td>${leg.rate.toPrecision(6)} per input unit<span class="secondary">${(quotes || leg.manual_price) && leg.kind !== 'vendor' ? 'Manual quote' : leg.kind === 'vendor' ? 'Fixed vendor rate' : 'Historical average'}; historical ${leg.low_rate.toPrecision(5)} to ${leg.high_rate.toPrecision(5)}</span></td>
+      <td>${leg.kind === 'vendor' ? 'Fixed batch: ' : 'Hourly: '}${format_number(historical_volume(historical.legs[i], 'input'))} input / ${format_number(historical_volume(historical.legs[i], 'output'))} output</td>
       <td>${leg.kind === 'vendor' ? 'Vendor, no market stock assumption' : `${format_number(leg.historical_low_stock)} to ${format_number(leg.historical_high_stock)}`}</td></tr>`).join('')}</tbody></table></div>
     <p>Profit per click = profit in the starting currency ÷ total estimated clicks. Each market leg with a nonzero input counts as one Faustus trade. Each completed vendor batch counts as one click, regardless of its reward quantity. Setup, inventory movement and travel are excluded. Manual prices also update vendor batch counts and click efficiency.</p>
     <p>Return = (ending amount ÷ starting amount − 1) × 100. Gold efficiency divides the total gold cost by the profit, excluding your starting balance. Gold is a separate expense and does not reduce the displayed currency amount.</p>
     <p>Gold estimates use the ${escape_html(fee_catalog.patch)} fee table, reviewed ${escape_html(fee_catalog.reviewed_at)}, and round each market fee up. ${cycle.simulation.gold.missing.length ? `Missing fees: ${cycle.simulation.gold.missing.map(currency_name).map(escape_html).join(', ')}. The total and efficiency are unavailable.` : 'One listing per market leg is assumed; cancellations and reposting are excluded.'} Rates are historical hourly averages; check each order and its gold fee in game.</p>
-    ${cycle.legs.some((leg, i) => leg.kind !== 'vendor' && cycle.simulation.amounts[i] > historical.legs[i].input_volume) ? '<p>Your modeled trade size exceeds the entire observed hourly input volume on at least one leg. This estimate extrapolates beyond the sample and is especially uncertain.</p>' : ''}`;
+    ${cycle.legs.some((leg, i) => leg.kind !== 'vendor' && cycle.simulation.amounts[i] > historical_volume(historical.legs[i], 'input')) ? '<p>Your modeled trade size exceeds the entire observed hourly input volume on at least one leg. This estimate extrapolates beyond the sample and is especially uncertain.</p>' : ''}`;
   by_id('leg_quotes').addEventListener('input', () => {by_id('quote_status').textContent = 'Quote edits pending. Recalculate to update the amounts below.';});
   by_id('leg_quotes').addEventListener('submit', event => {
     event.preventDefault();
@@ -104,6 +130,7 @@ function show_details(index, quotes = null) {
 
 function finish_render(league, result) {
   ranked = result.cycles;
+  update_quote_status();
   by_id('search_status').textContent = result.complete ? `Searched cycles of 2–${by_id('max_trades').value} trades, including the return trade.` : 'Partial results: search limit reached. Lower maximum trades or raise minimum volume. Statistics describe only the cycles found.';
   by_id('cycle_count').textContent = format_number(ranked.length);
   by_id('pair_count').textContent = format_number(league.active_pairs);
@@ -135,7 +162,7 @@ function render() {
   render_rows();
   try {
     const options = read_options();
-    const league = analysis.leagues.find(league => league.name === by_id('league').value);
+    const league = current_league();
     render_recipe();
     set_error('');
     by_id('search_status').textContent = `Searching cycles up to ${options.max_trades} trades…`;
@@ -145,7 +172,7 @@ function render() {
       finish_render(league, search_cycles(league, options));
       return;
     }
-    const worker = new Worker('./search_worker.mjs?v=click-profit-v1', {type: 'module'});
+    const worker = new Worker('./search_worker.mjs?v=chaos-prices-v1', {type: 'module'});
     search_worker = worker;
     worker.onmessage = ({data}) => {
       if (search_worker !== worker) return;
@@ -180,6 +207,7 @@ async function load_analysis() {
     by_id('league').disabled = false;
     by_id('start').disabled = false;
     update_currencies();
+    render_market_quotes();
     const start = new Date(analysis.hour * 1000);
     const end = new Date((analysis.hour + 3600) * 1000);
     const age_hours = (Date.now() / 1000 - analysis.hour - 3600) / 3600;
@@ -228,10 +256,10 @@ function render_recipe() {
   try {
     if (by_id('league').value.includes('Ruthless')) throw new Error('This catalogue is for non-Ruthless rules.');
     if (!by_id('recipe_controls').checkValidity()) throw new Error('Enter a valid whole number of batches.');
-    const league = analysis.leagues.find(league => league.name === by_id('league').value);
+    const league = current_league();
     const options = read_options();
     const result = quote_recipe(recipe, league.edges ?? [], Number(by_id('recipe_batches').value), 0, options.haircut_bps, fee_catalog.items, options.min_stock);
-    by_id('recipe_result').textContent = `Cost: ${format_number(result.cost)} chaos. Return: ${format_number(result.returned)} chaos. Profit: ${format_number(result.profit)} chaos (${result.profit_pct === null ? 'percentage undefined for zero cost' : format_pct(result.profit_pct)}). Estimated clicks: ${format_number(result.clicks.total)} (${format_number(Number(by_id('recipe_batches').value))} vendor batches plus market purchases and sales). Chaos profit per click: ${format_click_profit(result.clicks.profit_per_click)}. Estimated gold: ${format_gold(result.gold.total)}. ${gold_efficiency_text(result.gold, 'Chaos Orb')}. ${result.gold.missing.length ? `Missing fees: ${result.gold.missing.map(currency_name).join(', ')}. ` : ''}${options.gold_budget !== null && (result.gold.total === null || result.gold.total > options.gold_budget) ? 'This recipe does not meet your gold budget. ' : ''}Direct historical quotes with haircut and whole-unit rounding; one listing per market quote, time excluded.`;
+    by_id('recipe_result').textContent = `Cost: ${format_number(result.cost)} chaos. Return: ${format_number(result.returned)} chaos. Profit: ${format_number(result.profit)} chaos (${result.profit_pct === null ? 'percentage undefined for zero cost' : format_pct(result.profit_pct)}). Estimated clicks: ${format_number(result.clicks.total)} (${format_number(Number(by_id('recipe_batches').value))} vendor batches plus market purchases and sales). Chaos profit per click: ${format_click_profit(result.clicks.profit_per_click)}. Estimated gold: ${format_gold(result.gold.total)}. ${gold_efficiency_text(result.gold, 'Chaos Orb')}. ${result.gold.missing.length ? `Missing fees: ${result.gold.missing.map(currency_name).join(', ')}. ` : ''}${options.gold_budget !== null && (result.gold.total === null || result.gold.total > options.gold_budget) ? 'This recipe does not meet your gold budget. ' : ''}Applied search quotes with haircut and whole-unit rounding; one listing per market quote, time excluded.`;
     by_id('recipe_result').className = result.profit >= 0 ? 'positive' : 'negative';
   } catch (error) {
     by_id('recipe_result').textContent = error.message;
@@ -239,11 +267,25 @@ function render_recipe() {
   }
 }
 
+by_id('market_quotes').addEventListener('input', () => update_quote_status(true));
+by_id('market_quotes').addEventListener('submit', event => {
+  event.preventDefault();
+  try {
+    const quotes = common_currencies.map(currency => ({currency, ...Object.fromEntries(['buy', 'sell'].map(direction => [direction, Object.fromEntries(['input', 'output'].map(side => [side, document.querySelector(`[data-currency="${currency}"][data-direction="${direction}"][data-side="${side}"]`)?.value ?? '']))]))}));
+    const league = analysis.leagues.find(league => league.name === by_id('league').value);
+    apply_market_quotes(league, quotes);
+    market_quotes.set(league.name, quotes);
+    by_id('market_quote_error').hidden = true;
+    render();
+  } catch (error) {by_id('market_quote_error').hidden = false; by_id('market_quote_error').textContent = error.message;}
+});
+by_id('reset_market_quotes').addEventListener('click', () => {market_quotes.delete(by_id('league').value); render_market_quotes(); render();});
+
 by_id('recipe_controls').addEventListener('submit', event => event.preventDefault());
 by_id('recipe').addEventListener('change', select_recipe);
 for (const id of ['recipe_batches']) by_id(id).addEventListener('input', render_recipe);
 by_id('controls').addEventListener('submit', event => event.preventDefault());
-by_id('league').addEventListener('change', () => {update_currencies(); render();});
+by_id('league').addEventListener('change', () => {update_currencies(); render_market_quotes(); render();});
 for (const id of ['start', 'budget', 'haircut', 'min_profit', 'min_volume', 'min_stock', 'max_trades', 'route_type', 'gold_budget', 'sort_by']) by_id(id).addEventListener('input', render);
 by_id('rows').addEventListener('click', event => {
   const button = event.target.closest('button[data-cycle]');

@@ -85,16 +85,45 @@ function decimal_quantity(value) {
   return {quantity, scale};
 }
 
+function quoted_edge(leg, quote) {
+  const input = decimal_quantity(quote.input), output = decimal_quantity(quote.output);
+  const numerator = output.quantity * input.scale, denominator = input.quantity * output.scale;
+  const gcd = (a, b) => b === 0n ? a : gcd(b, a % b);
+  const divisor = gcd(numerator, denominator), x = denominator / divisor, y = numerator / divisor;
+  if (x > BigInt(Number.MAX_SAFE_INTEGER) || y > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error('Quote ratio exceeds supported precision.');
+  return {...leg, input_volume:Number(x), output_volume:Number(y), rate:Number(y) / Number(x)};
+}
+
+export const chaos_id = 'Metadata/Items/Currency/CurrencyRerollRare';
+export const common_currencies = ['CurrencyModValues', 'CurrencyAddModToRare', 'CurrencyRemoveMod', 'CurrencyRerollMagic', 'CurrencyUpgradeToRare', 'CurrencyUpgradeToMagic', 'CurrencyAddModToMagic', 'CurrencyUpgradeMagicToRare', 'CurrencyUpgradeRandomly', 'CurrencyConvertToNormal', 'CurrencyRerollSocketNumbers', 'CurrencyRerollSocketLinks', 'CurrencyRerollSocketColours', 'CurrencyCorrupt', 'CurrencyGemQuality', 'CurrencyFlaskQuality', 'CurrencyPassiveRefund', 'CurrencyAtlasPassiveRefund', 'CurrencyPortal', 'CurrencyIdentification'].map(id => `Metadata/Items/Currency/${id}`);
+export const historical_volume = (edge, side) => edge[`historical_${side}_volume`] ?? edge[`${side}_volume`];
+
+export function apply_market_quotes(league, quotes) {
+  if (!Array.isArray(quotes)) throw new Error('Enter valid market quotes.');
+  const overrides = new Map();
+  for (const quote of quotes) {
+    if (!common_currencies.includes(quote.currency)) throw new Error('Choose a common crafting currency.');
+    for (const direction of ['buy', 'sell']) {
+      const value = quote[direction];
+      if (!value || String(value.input).trim() === '' && String(value.output).trim() === '') continue;
+      const from = direction === 'buy' ? chaos_id : quote.currency, to = direction === 'buy' ? quote.currency : chaos_id;
+      const key = `${from}>${to}`;
+      if (overrides.has(key)) throw new Error('Duplicate manual market quote.');
+      const edge = league.edges.find(edge => edge.kind === 'market' && edge.from === from && edge.to === to);
+      if (!edge) throw new Error(`No historical ${direction} pair for ${currency_name(quote.currency)} in this league.`);
+      try {
+        overrides.set(key, {...quoted_edge(edge, value), manual_price:true, historical_input_volume:historical_volume(edge, 'input'), historical_output_volume:historical_volume(edge, 'output')});
+      } catch (error) { throw new Error(`${currency_name(quote.currency)} ${direction}: ${error.message}`); }
+    }
+  }
+  return {...league, edges:league.edges.map(edge => edge.kind === 'market' ? overrides.get(`${edge.from}>${edge.to}`) ?? edge : edge)};
+}
+
 export function manual_cycle(legs, quotes, budget, haircut_bps, fees = null) {
   if (!Array.isArray(quotes) || quotes.length !== legs.length) throw new Error('Enter a quote for each trade.');
   const adjusted = legs.map((leg, i) => {
     if (leg.kind === 'vendor') return {...leg};
-    const input = decimal_quantity(quotes[i].input), output = decimal_quantity(quotes[i].output);
-    const numerator = output.quantity * input.scale, denominator = input.quantity * output.scale;
-    const gcd = (a, b) => b === 0n ? a : gcd(b, a % b);
-    const divisor = gcd(numerator, denominator), x = denominator / divisor, y = numerator / divisor;
-    if (x > BigInt(Number.MAX_SAFE_INTEGER) || y > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error('Quote ratio exceeds supported precision.');
-    return {...leg, input_volume:Number(x), output_volume:Number(y), rate:Number(y) / Number(x)};
+    return quoted_edge(leg, quotes[i]);
   });
   return {legs:adjusted, simulation:simulate_cycle(adjusted, budget, haircut_bps, fees), profit_pct:profit_pct(adjusted.map(leg => leg.rate))};
 }
@@ -106,7 +135,7 @@ export function rank_cycles(league, options) {
     .filter(cycle => options.include_vendors !== false || cycle.legs.every(leg => leg.kind !== 'vendor'))
     .filter(cycle => cycle.legs.every(leg => has_historical_stock(leg, options.min_stock ?? 1)))
     .filter(cycle => !options.vendor_only || cycle.legs.some(leg => leg.kind === 'vendor'))
-    .filter(cycle => cycle.legs.every(leg => leg.kind === 'vendor' || leg.input_volume >= options.min_volume && leg.output_volume >= options.min_volume))
+    .filter(cycle => cycle.legs.every(leg => leg.kind === 'vendor' || historical_volume(leg, 'input') >= options.min_volume && historical_volume(leg, 'output') >= options.min_volume))
     .map(cycle => ({...cycle, simulation: simulate_cycle(cycle.legs, options.budget, options.haircut_bps, options.gold_fees)}))
     .filter(cycle => cycle.simulation.profit_pct >= options.min_profit)
     .filter(cycle => within_gold_budget(cycle.simulation, options))
@@ -148,7 +177,7 @@ export function search_cycles(league, options) {
   const graph = new Map(), reverse = new Map();
   for (const edge of league.edges) {
     if (!has_historical_stock(edge, options.min_stock ?? 1)) continue;
-    if (edge.kind === 'vendor' ? options.include_vendors === false : edge.input_volume < options.min_volume || edge.output_volume < options.min_volume) continue;
+    if (edge.kind === 'vendor' ? options.include_vendors === false : historical_volume(edge, 'input') < options.min_volume || historical_volume(edge, 'output') < options.min_volume) continue;
     if (!graph.has(edge.from)) graph.set(edge.from, []);
     graph.get(edge.from).push(edge);
     if (!reverse.has(edge.to)) reverse.set(edge.to, []);
