@@ -193,6 +193,11 @@ fn find_cycles(
     cycles: &mut Vec<Cycle>,
 ) {
     for edge in &graph[path.last().unwrap()] {
+        if edge.kind == "market"
+            && (edge.historical_low_stock == 0 || edge.historical_high_stock == 0)
+        {
+            continue;
+        }
         let has_vendor = edge.kind == "vendor" || legs.iter().any(|e| e.kind == "vendor");
         if edge.to == start && legs.len() >= 1 {
             let length = legs.len() + 1;
@@ -299,8 +304,8 @@ mod tests {
             rate: output_volume as f64 / input_volume as f64,
             low_rate: 1.0,
             high_rate: 2.0,
-            historical_low_stock: 0,
-            historical_high_stock: 0,
+            historical_low_stock: 100,
+            historical_high_stock: 200,
         }
     }
     #[test]
@@ -361,12 +366,12 @@ mod tests {
             let values = BTreeMap::from([(a.clone(), x), (b.clone(), y)]);
             Market {
                 league: league.into(),
-                market_pair: vec![a, b],
+                market_pair: vec![a.clone(), b.clone()],
                 volume_traded: values.clone(),
                 lowest_ratio: values.clone(),
                 highest_ratio: values,
-                lowest_stock: BTreeMap::new(),
-                highest_stock: BTreeMap::new(),
+                lowest_stock: BTreeMap::from([(a.clone(), 100), (b.clone(), 100)]),
+                highest_stock: BTreeMap::from([(a.clone(), 200), (b.clone(), 200)]),
             }
         };
         let mut snapshot = Snapshot {
@@ -387,6 +392,12 @@ mod tests {
             .all(|l| l.cycles.is_empty()));
         snapshot.markets[2].league = "one".into();
         assert_eq!(analyze(&snapshot).leagues[0].cycles.len(), 2);
+        snapshot.markets[2].lowest_stock.values_mut().for_each(|v| *v = 0);
+        assert!(analyze(&snapshot).leagues[0].cycles.is_empty());
+        snapshot.markets[2].lowest_stock.values_mut().for_each(|v| *v = 100);
+        snapshot.markets[2].highest_stock.values_mut().for_each(|v| *v = 0);
+        assert!(analyze(&snapshot).leagues[0].cycles.is_empty());
+        snapshot.markets[2].highest_stock.values_mut().for_each(|v| *v = 200);
         snapshot.markets[2]
             .volume_traded
             .values_mut()
