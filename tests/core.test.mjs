@@ -195,3 +195,36 @@ test('stock thresholds include equality and reject a low stock dip on any market
   assert.throws(()=>quote_recipe(recipe,quotes,1,0,0,null,101),/at least 101/);
   assert.throws(()=>quote_recipe(recipe,quotes,1,0,0,null,0),/Minimum historical stock/);
 });
+
+test('manual quotes recalculate every leg and gold without mutating historical rates', async () => {
+  const {manual_cycle} = await import('../web/core.mjs');
+  const fees = {a:{fee:[15,1]}, b:{fee:[20,1]}};
+  const legs = [leg('a','b',1,2),leg('b','a',10,6)];
+  const saved = structuredClone(legs);
+  const quotes = [{input:'1',output:'2.5'},{input:'2',output:'1.1'}];
+  const result = manual_cycle(legs,quotes,100,0,fees);
+  assert.deepEqual(result.simulation.amounts,[100,250,137]);
+  assert.equal(result.simulation.profit,37);
+  assert.deepEqual(result.simulation.gold.leg_costs,[5000,2055]);
+  assert.equal(result.simulation.gold.total,7055);
+  assert.equal(result.simulation.gold.gold_per_profit,7055/37);
+  assert.deepEqual(legs,saved);
+  assert.deepEqual(manual_cycle(legs,legs.map(e=>({input:String(e.input_volume),output:String(e.output_volume)})),100,100,fees).simulation,simulate_cycle(legs,100,100,fees));
+  assert.equal(manual_cycle(legs,[quotes[0],{input:'2',output:'0.5'}],100,0,fees).simulation.profit,-38);
+  assert.equal(manual_cycle(legs,[quotes[0],{input:'2',output:'0.5'}],100,0,fees).simulation.gold.gold_per_profit,null);
+  const vendor = {...leg('a','b',3,4),kind:'vendor',rate:4/3};
+  const mixed = manual_cycle([vendor,legs[1]],[{input:'0',output:'999'},{input:'1',output:'1'}],10,0,fees);
+  assert.deepEqual(mixed.simulation.amounts,[10,12,12]);
+  assert.deepEqual(mixed.simulation.leftovers,[1,0]);
+  assert.deepEqual(mixed.simulation.gold.leg_costs,[0,180]);
+});
+
+test('manual decimal rates use exact arithmetic and reject invalid quotes', async () => {
+  const {manual_cycle} = await import('../web/core.mjs');
+  const legs = [leg('a','b',1,1)];
+  assert.equal(manual_cycle(legs,[{input:'0.1',output:'0.3'}],10,0).simulation.end,30);
+  assert.equal(manual_cycle(legs,[{input:'1',output:'0.999999999999'}],1000,0).simulation.end,999);
+  for (const input of ['','0','-1','NaN','Infinity','1e3','0.0000000000001','9007199254740992']) assert.throws(()=>manual_cycle(legs,[{input,output:'1'}],10,0),/Quote/);
+  assert.throws(()=>manual_cycle(legs,[],10,0),/each trade/);
+  assert.throws(()=>manual_cycle(legs,[{input:'0.000000000001',output:'9007199254740991'}],10,0),/precision/);
+});

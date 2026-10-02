@@ -14,7 +14,7 @@ Only quoted currency items enter the cycle graph. Currency recipes have a separa
 
 ## Usage
 
-Select your league and starting currency on the website, enter a starting amount, and inspect a cycle to see its individual trades. The displayed profit includes rounding and the selected haircut.
+Select your league and starting currency on the website, enter a starting amount, and inspect a cycle to see its individual trades. The displayed profit includes rounding and the selected haircut. In an inspected cycle, enter the give and receive quantities for each market leg and choose Recalculate cycle to test current prices. Decimal quantities are accepted with up to 12 decimal places using exact rational arithmetic. Vendor batches stay fixed. Manual scenarios update the ending balance, profit and gold costs without changing the historical search results, stock or volume. Reset historical rates restores the original scenario.
 
 To scan a snapshot from the command line:
 

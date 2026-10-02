@@ -67,6 +67,29 @@ export function simulate_cycle(legs, budget, haircut_bps, fees = null) {
     gold: gold_summary(legs.map((leg, i) => ({...leg, quantity:Number(amounts[i + 1])})), end - budget, fees)};
 }
 
+function decimal_quantity(value) {
+  const text = String(value).trim();
+  if (!/^\d+(?:\.\d{1,12})?$/.test(text)) throw new Error('Quote amounts must be positive decimal numbers with at most 12 decimal places.');
+  const [whole, fraction = ''] = text.split('.');
+  const quantity = BigInt(whole + fraction), scale = 10n ** BigInt(fraction.length);
+  if (quantity <= 0n || quantity > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error('Quote amount is zero or exceeds supported precision.');
+  return {quantity, scale};
+}
+
+export function manual_cycle(legs, quotes, budget, haircut_bps, fees = null) {
+  if (!Array.isArray(quotes) || quotes.length !== legs.length) throw new Error('Enter a quote for each trade.');
+  const adjusted = legs.map((leg, i) => {
+    if (leg.kind === 'vendor') return {...leg};
+    const input = decimal_quantity(quotes[i].input), output = decimal_quantity(quotes[i].output);
+    const numerator = output.quantity * input.scale, denominator = input.quantity * output.scale;
+    const gcd = (a, b) => b === 0n ? a : gcd(b, a % b);
+    const divisor = gcd(numerator, denominator), x = denominator / divisor, y = numerator / divisor;
+    if (x > BigInt(Number.MAX_SAFE_INTEGER) || y > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error('Quote ratio exceeds supported precision.');
+    return {...leg, input_volume:Number(x), output_volume:Number(y), rate:Number(y) / Number(x)};
+  });
+  return {legs:adjusted, simulation:simulate_cycle(adjusted, budget, haircut_bps, fees), profit_pct:profit_pct(adjusted.map(leg => leg.rate))};
+}
+
 export function rank_cycles(league, options) {
   validate_gold_options(options);
   validate_min_stock(options.min_stock ?? 1);
