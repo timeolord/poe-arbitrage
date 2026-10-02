@@ -199,7 +199,7 @@ by_id('recipe').addEventListener('change', select_recipe);
 for (const id of ['recipe_batches']) by_id(id).addEventListener('input', render_recipe);
 by_id('controls').addEventListener('submit', event => event.preventDefault());
 by_id('league').addEventListener('change', () => {update_currencies(); render();});
-for (const id of ['start', 'budget', 'haircut', 'min_profit', 'min_volume', 'route_type']) by_id(id).addEventListener('input', render);
+for (const id of ['start', 'budget', 'haircut', 'min_profit', 'min_volume', 'max_trades', 'route_type']) by_id(id).addEventListener('input', render);
 by_id('rows').addEventListener('click', event => {
   const button = event.target.closest('button[data-cycle]');
   if (button) {show_details(Number(button.dataset.cycle)); by_id('details').scrollIntoView({behavior:'smooth', block:'start'});}
