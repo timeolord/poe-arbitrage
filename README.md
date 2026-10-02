@@ -6,9 +6,9 @@ Live at [www.melkyway.ca/poe-arbitrage](https://www.melkyway.ca/poe-arbitrage/).
 
 ## Overview
 
-The scanner treats currencies as a directed graph, with exchange rates calculated from traded volumes. It looks for three-trade market cycles such as chaos → divine → exalted → chaos and two to four trade routes containing fixed vendor exchanges, keeping leagues separate and removing duplicate rotations of the same route.
+The scanner treats currencies as a directed graph, with exchange rates calculated from traded volumes. The dashboard searches market and vendor cycles from two trades up to the user’s maximum (2–8), including the return trade. Each currency appears once before returning to the starting currency, and leagues remain separate.
 
-The dashboard simulates each cycle using a whole-unit starting balance. It shows the ending balance, profit percentage, historical rate range, and details for each trade. Filters select the league, starting currency, minimum profit, and minimum traded volume. An optional haircut reduces the estimated return on each market trade to model slippage. Fixed vendor trades use exact whole batches without a haircut.
+The dashboard simulates each cycle using a whole-unit starting balance. It shows the ending balance, profit percentage, historical rate range, and details for each trade. Filters select the league, starting currency, minimum profit, minimum traded volume, and maximum trades. An optional haircut reduces the estimated return on each market trade to model slippage. Fixed vendor trades use exact whole batches without a haircut.
 
 Only quoted currency items enter the cycle graph. Currency recipes have a separate calculator that values every input and reward against direct historical Chaos market quotes. The catalogue contains only deterministic currency exchanges.
 
@@ -22,7 +22,7 @@ To scan a snapshot from the command line:
 cargo run --locked --release -- data/snapshot.json analysis.json Allflame 1000
 ```
 
-This writes results for all leagues to JSON and prints the ten highest positive central returns for the selected league. The command line uses each cycle's canonical starting currency; the dashboard rotates cycles to your selected currency.
+This writes results for all leagues to JSON and prints the ten highest positive central returns for the selected league. The command line uses each cycle's canonical starting currency; the dashboard searches directly from your selected currency.
 
 ## Development
 
@@ -57,6 +57,8 @@ node --test tests/core.test.mjs
 
 `scripts/fetch_snapshot.py` fetches an hourly snapshot from GGG. `web/` contains the dashboard and browser calculator, which uses JavaScript BigInt for whole-unit balances.
 
+Browser searches run in a cancellable web worker using the full edge graph, independently of the Rust precomputed cycles. Searches stop after two million edge checks or 25,000 matching cycles. The dashboard explicitly labels partial results; counts, best returns and medians then describe only the cycles found. Lower the maximum trades or increase minimum volume for a complete search.
+
 The GitHub Actions workflow tests the project, fetches a snapshot, scans cycles, and deploys `web/` to GitHub Pages. It runs on pushes, manual dispatch, and hourly at minute 17. Raw snapshots are archived for 30 days. A failed refresh leaves the previous deployment in place.
 
 ## Calculations
@@ -78,11 +80,11 @@ Pairs with zero volume, invalid ratios, or a central rate outside the reported r
 
 `web/vendor_recipes.json` contains the sourced currency recipe catalogue. The scanner adds fixed one-input, one-output vendor exchanges alongside market edges, retaining both when they connect the same currencies. This includes the directional Portal and Wisdom scroll trades, the normal currency purchase chain, Kirac's Unmaking exchange, currency sales for Wisdom Scrolls, and quoted adjacent essence upgrades. Vendor-only cycles are excluded.
 
-A vendor leg returns `floor(amount / input_batch) * output_batch`. Unspent inputs are displayed but excluded from the ending balance. The catalogue uses current non-Ruthless rules against the historical snapshot; it does not reconstruct vendor rules from the snapshot's patch date. Vendor scanning and recipe estimates are disabled for Ruthless leagues.
+A vendor leg returns `floor(amount / input_batch) * output_batch`. Unspent inputs are displayed but excluded from the ending balance. The catalogue uses documented 3.29 non-Ruthless rules against the historical snapshot; it does not reconstruct vendor rules from the snapshot's patch date. Vendor scanning and recipe estimates are disabled for Ruthless leagues.
 
 The recipe calculator buys each currency ingredient with Chaos Orbs using a direct quote, rounding the required Chaos up. It then sells every currency reward back to Chaos and rounds down. Profit percentage is `100 * (return / total_cost - 1)`. Missing quotes suppress estimates, and a zero cost has no defined percentage. Available orders, travel time and gold are not supplied by GGG's hourly feed.
 
-The catalogue contains 17 fixed exchanges and two currency baskets: Fusing plus Chromatic to Jeweller, and the Mirror sale with multiple currency rewards. Equipment, gem, flask, quest-item and map recipes, random exchanges, retired recipes and unused references are excluded. Quoted adjacent essence upgrades remain in the scanner. Each catalogue entry links its reference.
+The catalogue contains 16 fixed exchanges and two currency baskets: Fusing plus Chromatic to Jeweller, and the Mirror sale with multiple currency rewards. Equipment, gem, flask, quest-item and map recipes, random exchanges, retired recipes and unused references are excluded. Quoted adjacent essence upgrades remain in the scanner. Each catalogue entry links its rate reference and the 3.29 patch notes. The review checks documented rates against patch changes; it is not an in-game verification. [GGG removed Jeweller’s-to-Chromatic purchases in 3.29](https://www.pathofexile.com/forum/view-thread/3985332), so that exchange is excluded.
 
 ## Data
 
