@@ -8,7 +8,7 @@ Live at [www.melkyway.ca/poe-arbitrage](https://www.melkyway.ca/poe-arbitrage/).
 
 The scanner treats currencies as a directed graph, with exchange rates calculated from traded volumes. The dashboard searches market and vendor cycles from two trades up to the user’s maximum (2–8), including the return trade. Each currency appears once before returning to the starting currency, and leagues remain separate.
 
-The dashboard simulates each cycle using a whole-unit starting balance. It shows the ending balance, profit percentage, historical rate range, estimated gold fees, gold per unit of profit, and details for each trade. Filters select the league, starting currency, minimum profit, minimum traded volume, maximum trades, and an optional gold budget. Cycles can be sorted by profit percentage or profit per 100,000 gold. An optional haircut reduces the estimated return on each market trade to model slippage. Fixed vendor trades use exact whole batches without a haircut.
+The dashboard simulates each cycle using a whole-unit starting balance. It shows the ending balance, profit percentage, historical rate range, estimated gold fees, gold per unit of profit, and details for each trade. Filters select the league, starting currency, minimum profit, minimum traded volume, minimum historical output stock, maximum trades, and an optional gold budget. Cycles can be sorted by profit percentage or profit per 100,000 gold. An optional haircut reduces the estimated return on each market trade to model slippage. Fixed vendor trades use exact whole batches without a haircut.
 
 Only quoted currency items enter the cycle graph. Currency recipes have a separate calculator that values every input and reward against direct historical Chaos market quotes. The catalogue contains only deterministic currency exchanges.
 
@@ -74,7 +74,7 @@ profit_percent = 100 * (ending_balance / starting_balance - 1)
 
 The historical range uses the two complete ratio vectors reported by GGG. Each vector is converted to a directed rate, then the rates are ordered into low and high values. Multiplying the low rates and high rates across a cycle gives the displayed range before rounding and haircut.
 
-Pairs with zero volume, invalid ratios, or a central rate outside the reported range are skipped. The volume filter applies independently to both sides of every market trade. Market legs with zero or missing minimum or maximum historical output stock are excluded from cycle searches and recipe quotes. Fixed vendor trades are exempt. A zero minimum means stock reached zero at some point during the hour, not necessarily that nobody traded. Positive historical stock does not establish current liquidity. Vendor quantities are recipe batch sizes, not observed liquidity.
+Pairs with zero volume, invalid ratios, or a central rate outside the reported range are skipped. The volume filter applies independently to both sides of every market trade. Every market leg must meet the selected minimum historical output stock threshold in cycle searches and recipe quotes. Both reported stock endpoints must be at least the threshold, which counts units of the receiving currency. The default is 1, retaining the exclusion of zero or missing stock. Equal stock passes the threshold. Fixed vendor trades are exempt. A zero minimum means stock reached zero at some point during the hour, not necessarily that nobody traded. Positive historical stock does not establish current liquidity. Vendor quantities are recipe batch sizes, not observed liquidity.
 
 ## Vendor recipes
 
