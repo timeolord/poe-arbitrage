@@ -1,0 +1,841 @@
+{
+  "checked_at": "2026-10-02",
+  "ruleset": "PoE 1, current non-Ruthless vendor rules",
+  "recipes": [
+    {
+      "id": "buy_CurrencyPortal",
+      "name": "Buy Portal Scroll",
+      "kind": "fixed",
+      "vendor": "Nessa, Act 1",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyIdentification": 3
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyPortal": 1
+      },
+      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "buy_CurrencyUpgradeToMagic",
+      "name": "Buy Orb of Transmutation",
+      "kind": "fixed",
+      "vendor": "Nessa, Act 1",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyPortal": 7
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeToMagic": 1
+      },
+      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "buy_CurrencyAddModToMagic",
+      "name": "Buy Orb of Augmentation",
+      "kind": "fixed",
+      "vendor": "Nessa, Act 1",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeToMagic": 4
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyAddModToMagic": 1
+      },
+      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "buy_CurrencyRerollMagic",
+      "name": "Buy Orb of Alteration",
+      "kind": "fixed",
+      "vendor": "Nessa, Act 1",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyAddModToMagic": 4
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyRerollMagic": 1
+      },
+      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "buy_CurrencyRerollSocketNumbers",
+      "name": "Buy Jeweller’s Orb",
+      "kind": "fixed",
+      "vendor": "Yeena, Act 2",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyRerollMagic": 2
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyRerollSocketNumbers": 1
+      },
+      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "buy_CurrencyRerollSocketColours",
+      "name": "Buy Chromatic Orb",
+      "kind": "fixed",
+      "vendor": "Yeena, Act 2",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyRerollSocketNumbers": 3
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyRerollSocketColours": 1
+      },
+      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "buy_CurrencyRerollSocketLinks",
+      "name": "Buy Orb of Fusing",
+      "kind": "fixed",
+      "vendor": "Yeena, Act 2",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyRerollSocketNumbers": 4
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyRerollSocketLinks": 1
+      },
+      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "buy_CurrencyUpgradeRandomly",
+      "name": "Buy Orb of Chance",
+      "kind": "fixed",
+      "vendor": "Clarissa, Act 3",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyRerollSocketLinks": 1
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeRandomly": 1
+      },
+      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "buy_CurrencyConvertToNormal",
+      "name": "Buy Orb of Scouring",
+      "kind": "fixed",
+      "vendor": "Yeena, Act 2",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeRandomly": 4
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyConvertToNormal": 1
+      },
+      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "buy_CurrencyPassiveRefund",
+      "name": "Buy Orb of Regret",
+      "kind": "fixed",
+      "vendor": "Yeena, Act 2",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyConvertToNormal": 2
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyPassiveRefund": 1
+      },
+      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "buy_CurrencyUpgradeToRare",
+      "name": "Buy Orb of Alchemy",
+      "kind": "fixed",
+      "vendor": "Clarissa, Act 3",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyPassiveRefund": 1
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeToRare": 1
+      },
+      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "buy_CurrencyAtlasPassiveRefund",
+      "name": "Buy Orb of Unmaking",
+      "kind": "fixed",
+      "vendor": "Kirac, endgame",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyPassiveRefund": 2
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyAtlasPassiveRefund": 1
+      },
+      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "sell_CurrencyPortal",
+      "name": "Sell Portal Scroll",
+      "kind": "fixed",
+      "vendor": "Any town vendor",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyPortal": 1
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyIdentification": 1
+      },
+      "requirements": "Sell currency to the vendor. This is separate from purchasing currency.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "sell_CurrencyArmourQuality",
+      "name": "Sell Armourer’s Scrap",
+      "kind": "fixed",
+      "vendor": "Any town vendor",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyArmourQuality": 1
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyIdentification": 2
+      },
+      "requirements": "Sell currency to the vendor. This is separate from purchasing currency.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "sell_CurrencyWeaponQuality",
+      "name": "Sell Blacksmith’s Whetstone",
+      "kind": "fixed",
+      "vendor": "Any town vendor",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyWeaponQuality": 1
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyIdentification": 4
+      },
+      "requirements": "Sell currency to the vendor. This is separate from purchasing currency.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "sell_CurrencyRerollMagic",
+      "name": "Sell Orb of Alteration",
+      "kind": "fixed",
+      "vendor": "Any town vendor",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyRerollMagic": 1
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyIdentification": 4
+      },
+      "requirements": "Sell currency to the vendor. This is separate from purchasing currency.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "sell_CurrencyUpgradeToMagic",
+      "name": "Sell Orb of Transmutation",
+      "kind": "fixed",
+      "vendor": "Any town vendor",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeToMagic": 1
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyIdentification": 4
+      },
+      "requirements": "Sell currency to the vendor. This is separate from purchasing currency.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "jeweller_basket",
+      "name": "Fusing and chromatic to jeweller",
+      "kind": "basket",
+      "vendor": "Any town vendor",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyRerollSocketLinks": 1,
+        "Metadata/Items/Currency/CurrencyRerollSocketColours": 1
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyRerollSocketNumbers": 1
+      },
+      "requirements": "",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "mirror",
+      "name": "Sell a Mirror of Kalandra",
+      "kind": "basket",
+      "vendor": "Any town vendor",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyDuplicate": 1
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyAddModToRare": 2,
+        "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": 5,
+        "Metadata/Items/Currency/CurrencyModValues": 1
+      },
+      "requirements": "",
+      "source": "https://www.poewiki.net/wiki/Mirror_of_Kalandra"
+    },
+    {
+      "id": "instilling",
+      "name": "Instilling Orb",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyEnkindlingOrb": 2,
+        "Metadata/Items/Currency/CurrencyUpgradeToRare": 1
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyInstillingOrb": 1
+      },
+      "requirements": "One gem with the Trigger tag per batch.",
+      "source": "https://www.poewiki.net/wiki/Instilling_Orb"
+    },
+    {
+      "id": "enkindling",
+      "name": "Enkindling Orb",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {
+        "Metadata/Items/Currency/CurrencyInstillingOrb": 4,
+        "Metadata/Items/Currency/CurrencyConvertToNormal": 1
+      },
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyEnkindlingOrb": 1
+      },
+      "requirements": "One gem with the Trigger tag per batch.",
+      "source": "https://www.poewiki.net/wiki/Enkindling_Orb"
+    },
+    {
+      "id": "vaal",
+      "name": "Vaal Orb",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyCorrupt": 1
+      },
+      "requirements": "Seven Vaal skill gems and one Sacrifice fragment per batch.",
+      "source": "https://www.poewiki.net/wiki/Vaal_Orb"
+    },
+    {
+      "id": "rgb",
+      "name": "Linked RGB sockets",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyRerollSocketColours": 1
+      },
+      "requirements": "One item with linked red, green and blue sockets. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "six_sockets",
+      "name": "Six sockets",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyRerollSocketNumbers": 7
+      },
+      "requirements": "One item with six sockets. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "six_links",
+      "name": "Six linked sockets",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyRerollSocketLinks": 20
+      },
+      "requirements": "One item with six linked sockets. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "six_affixes",
+      "name": "Six explicit affixes",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyAddModToMagic": 1
+      },
+      "requirements": "One rare item with six explicit affixes. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "two_affixes",
+      "name": "Two explicit affixes",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyConvertToNormal": 1
+      },
+      "requirements": "One rare item with exactly two explicit affixes. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "same_name_two",
+      "name": "Two matching rare names",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeRandomly": 1
+      },
+      "requirements": "Two identified rare items with the same generated name. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "same_name_three",
+      "name": "Three matching rare names",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeToRare": 1
+      },
+      "requirements": "Three identified rare items with the same generated name. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "same_name_two_quality",
+      "name": "Two matching rare names, quality",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeToRare": 1
+      },
+      "requirements": "Two identified rare items with the same name, each 20% quality. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "same_name_three_quality",
+      "name": "Three matching rare names, quality",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": 1
+      },
+      "requirements": "Three identified rare items with the same name, each 20% quality. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rarity_set",
+      "name": "Normal, magic and rare",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyAddModToMagic": 1
+      },
+      "requirements": "Three items with the same base type, one of each rarity. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rarity_set_unid",
+      "name": "Normal, magic and rare, unidentified",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyAddModToMagic": 2
+      },
+      "requirements": "Same base type; magic and rare items unidentified. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rarity_set_quality",
+      "name": "Normal, magic and rare, quality",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeToRare": 1
+      },
+      "requirements": "Same base type; all three items 20% quality. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rarity_set_both",
+      "name": "Normal, magic and rare, quality and unidentified",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeToRare": 2
+      },
+      "requirements": "Same base type; all 20% quality; magic and rare unidentified. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rarity_set_unique",
+      "name": "Normal, magic, rare and unique",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeRandomly": 5
+      },
+      "requirements": "Four items with the same base type, one of each rarity. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "quality_armour",
+      "name": "Armour quality",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyArmourQuality": 1
+      },
+      "requirements": "One normal armour item at 20% quality, or armour with total quality at least 40%. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "quality_weapon",
+      "name": "Weapon quality",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyWeaponQuality": 1
+      },
+      "requirements": "One normal weapon at 20% quality, or weapons with total quality at least 40%. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "quality_flask",
+      "name": "Flask quality",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyFlaskQuality": 1
+      },
+      "requirements": "One normal flask at 20% quality, or flasks with total quality at least 40%. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "quality_gem",
+      "name": "Gem quality",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyGemQuality": 1
+      },
+      "requirements": "One gem at 20% quality, or gems with total quality at least 40%. Use one recipe batch per calculation; overlapping recipes do not stack.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rare_chance_normal",
+      "name": "Chance rare set: normal",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeRandomly": 1
+      },
+      "requirements": "Complete rare equipment set: body, helmet, gloves, boots, belt, amulet, two rings and weapon slots. Lowest item level 1 to 59.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rare_chance_unid",
+      "name": "Chance rare set: unid",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeRandomly": 2
+      },
+      "requirements": "Complete rare equipment set: body, helmet, gloves, boots, belt, amulet, two rings and weapon slots. Lowest item level 1 to 59. All items unidentified.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rare_chance_quality",
+      "name": "Chance rare set: quality",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeRandomly": 2
+      },
+      "requirements": "Complete rare equipment set: body, helmet, gloves, boots, belt, amulet, two rings and weapon slots. Lowest item level 1 to 59. All applicable items at 20% quality.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rare_chance_both",
+      "name": "Chance rare set: both",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeRandomly": 3
+      },
+      "requirements": "Complete rare equipment set: body, helmet, gloves, boots, belt, amulet, two rings and weapon slots. Lowest item level 1 to 59. All items unidentified and all applicable items at 20% quality.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rare_chaos_normal",
+      "name": "Chaos rare set: normal",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyRerollRare": 1
+      },
+      "requirements": "Complete rare equipment set: body, helmet, gloves, boots, belt, amulet, two rings and weapon slots. Lowest item level 60 to 74.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rare_chaos_unid",
+      "name": "Chaos rare set: unid",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyRerollRare": 2
+      },
+      "requirements": "Complete rare equipment set: body, helmet, gloves, boots, belt, amulet, two rings and weapon slots. Lowest item level 60 to 74. All items unidentified.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rare_chaos_quality",
+      "name": "Chaos rare set: quality",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyRerollRare": 2
+      },
+      "requirements": "Complete rare equipment set: body, helmet, gloves, boots, belt, amulet, two rings and weapon slots. Lowest item level 60 to 74. All applicable items at 20% quality.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rare_chaos_both",
+      "name": "Chaos rare set: both",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyRerollRare": 3
+      },
+      "requirements": "Complete rare equipment set: body, helmet, gloves, boots, belt, amulet, two rings and weapon slots. Lowest item level 60 to 74. All items unidentified and all applicable items at 20% quality.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rare_regal_normal",
+      "name": "Regal rare set: normal",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": 1
+      },
+      "requirements": "Complete rare equipment set: body, helmet, gloves, boots, belt, amulet, two rings and weapon slots. Lowest item level 75 or higher.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rare_regal_unid",
+      "name": "Regal rare set: unid",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": 2
+      },
+      "requirements": "Complete rare equipment set: body, helmet, gloves, boots, belt, amulet, two rings and weapon slots. Lowest item level 75 or higher. All items unidentified.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rare_regal_quality",
+      "name": "Regal rare set: quality",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": 2
+      },
+      "requirements": "Complete rare equipment set: body, helmet, gloves, boots, belt, amulet, two rings and weapon slots. Lowest item level 75 or higher. All applicable items at 20% quality.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "rare_regal_both",
+      "name": "Regal rare set: both",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": 3
+      },
+      "requirements": "Complete rare equipment set: body, helmet, gloves, boots, belt, amulet, two rings and weapon slots. Lowest item level 75 or higher. All items unidentified and all applicable items at 20% quality.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "influenced_identified",
+      "name": "Influenced rare set: identified",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyAddModToRare": 1
+      },
+      "requirements": "Complete rare equipment set with every item sharing one influence. Updated for 3.28: rewards Exalted Orbs.",
+      "source": "https://www.pathofexile.com/forum/view-thread/3913392"
+    },
+    {
+      "id": "influenced_unidentified",
+      "name": "Influenced rare set: unidentified",
+      "kind": "item",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {
+        "Metadata/Items/Currency/CurrencyAddModToRare": 2
+      },
+      "requirements": "Complete rare equipment set with every item sharing one influence. All items unidentified. Updated for 3.28: rewards Exalted Orbs.",
+      "source": "https://www.pathofexile.com/forum/view-thread/3913392"
+    },
+    {
+      "id": "essences",
+      "name": "Essence upgrade",
+      "kind": "reference",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "Three matching essences yield one of the next tier. Deafening and corrupted essences cannot be upgraded. Matching currency IDs present in the snapshot are scanned automatically.",
+      "source": "https://www.poewiki.net/wiki/Essence"
+    },
+    {
+      "id": "oils",
+      "name": "Oil upgrade",
+      "kind": "reference",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "Three matching oils yield one of the next tier. Special oils and the top tier are excluded. Oil prices are not present in the currency-only snapshot used here, so this rule is documented but not scanned.",
+      "source": "https://www.poewiki.net/wiki/Oil"
+    },
+    {
+      "id": "shards",
+      "name": "Currency shards and scroll fragments",
+      "kind": "reference",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "Stack conversion is automatic, not a vendor trade. Five scroll fragments make a Wisdom Scroll; most currency shards combine at twenty. These are not scanned without a quoted shard market.",
+      "source": "https://www.poewiki.net/wiki/Currency"
+    },
+    {
+      "id": "affixes",
+      "name": "Identified item shards",
+      "kind": "reference",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "Alteration and Alchemy shard rewards depend on the actual modifiers. Check the sell window; no fixed return is assumed.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "unid_items",
+      "name": "Unidentified item shards",
+      "kind": "reference",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "Unidentified magic and rare equipment yields Transmutation shards. Item type and competing recipes affect the actual sell-window result.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "faustus",
+      "name": "Faustus and Heist targets",
+      "kind": "reference",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "Faustus runs the player currency market. He also buys Heist targets for an item-specific Rogue Marker value. Neither supplies a universal additional fixed exchange rate.",
+      "source": "https://www.poewiki.net/wiki/Faustus"
+    },
+    {
+      "id": "vessels",
+      "name": "Divine Vessels",
+      "kind": "reference",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "Five normal flasks and one Divine Orb produce five Divine Vessels. Item and output prices are required; vessels are outside the currency-only graph.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "reform",
+      "name": "Book of Reform",
+      "kind": "reference",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "A Book of Reform sells for twenty Orbs of Regret. The quest item cannot be purchased on the currency market.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "vaults",
+      "name": "Vaults of Atziri",
+      "kind": "reference",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "Selling the Vaults of Atziri unique map returns a Chaos Orb. Map acquisition cost is outside this feed.",
+      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+    },
+    {
+      "id": "catalysts",
+      "name": "Catalyst reroll",
+      "kind": "random",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "Three matching catalysts yield a random catalyst. Quality jewellery also yields a random catalyst; no deterministic profit is claimed.",
+      "source": "https://www.poewiki.net/wiki/Catalyst"
+    },
+    {
+      "id": "scarabs",
+      "name": "Scarab reroll",
+      "kind": "random",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "Three scarabs yield a random scarab of a different type. Not a guaranteed conversion.",
+      "source": "https://www.poewiki.net/wiki/Scarab"
+    },
+    {
+      "id": "tattoos",
+      "name": "Tattoo reroll",
+      "kind": "random",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "Three tattoos of the same tribe yield one random tattoo from that tribe.",
+      "source": "https://www.poewiki.net/wiki/Tattoo"
+    },
+    {
+      "id": "chisels",
+      "name": "Cartographer chisels",
+      "kind": "retired",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "All Chisel vendor recipes removed in 3.28.",
+      "source": "https://www.pathofexile.com/forum/view-thread/3913392"
+    },
+    {
+      "id": "bauble_purchase",
+      "name": "Quality currency purchases",
+      "kind": "retired",
+      "vendor": "Any town vendor",
+      "inputs": {},
+      "outputs": {},
+      "requirements": "Quality-currency-priced purchases and vendor Bauble purchases removed in 3.25. Selling quality currency and quality-item recipes are separate.",
+      "source": "https://www.pathofexile.com/forum/view-thread/3531661"
+    }
+  ]
+}

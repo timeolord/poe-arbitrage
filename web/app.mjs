@@ -1,4 +1,4 @@
-import {currency_name, rank_cycles} from './core.mjs';
+import {currency_name, rank_cycles, quote_recipe} from './core.mjs?v=vendors1';
 
 const by_id = id => document.getElementById(id);
 const format_number = value => new Intl.NumberFormat(undefined, {maximumFractionDigits: 2}).format(value);
@@ -6,6 +6,7 @@ const format_pct = value => `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
 const escape_html = text => String(text).replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
 const route_html = path => `<div class="route">${[...path, path[0]].map(currency_name).map(escape_html).join('<span>→</span>')}</div>`;
 let analysis;
+let catalog;
 let ranked = [];
 let page_size = 40;
 let selected_index = null;
@@ -17,7 +18,7 @@ function set_error(message) {
 
 function read_options() {
   if (!by_id('controls').checkValidity()) throw new Error('Enter valid numbers in each field.');
-  const options = {start: by_id('start').value, budget: Number(by_id('budget').value), haircut_bps: Math.round(Number(by_id('haircut').value) * 100), min_volume: Number(by_id('min_volume').value), min_profit: Number(by_id('min_profit').value)};
+  const options = {start: by_id('start').value, budget: Number(by_id('budget').value), haircut_bps: Math.round(Number(by_id('haircut').value) * 100), min_volume: Number(by_id('min_volume').value), min_profit: Number(by_id('min_profit').value), include_vendors: by_id('route_type').value !== 'market', vendor_only: by_id('route_type').value === 'vendor'};
   if (!Number.isSafeInteger(options.min_volume) || options.min_volume < 1) throw new Error('Minimum volume must be a positive whole number.');
   return options;
 }
@@ -33,7 +34,7 @@ function update_currencies() {
 
 function render_rows() {
   by_id('rows').innerHTML = ranked.slice(0, page_size).map((cycle, index) => `<tr${index === selected_index ? ' class="selected"' : ''}>
-    <td>${route_html(cycle.path)}</td>
+    <td>${route_html(cycle.path)}<span class="secondary">${cycle.legs.filter(leg => leg.kind === 'vendor').length} vendor / ${cycle.legs.filter(leg => leg.kind !== 'vendor').length} market trades</span></td>
     <td><span class="profit ${cycle.simulation.profit_pct >= 0 ? 'positive' : 'negative'}">${format_pct(cycle.simulation.profit_pct)}</span><span class="secondary">after rounding &amp; haircut</span></td>
     <td>${format_number(cycle.simulation.end)}</td><td>${cycle.simulation.profit >= 0 ? '+' : ''}${format_number(cycle.simulation.profit)}</td>
     <td>${format_pct(cycle.low_profit_pct)} to ${format_pct(cycle.high_profit_pct)}<span class="secondary">unrounded, before haircut</span></td>
@@ -52,13 +53,13 @@ function show_details(index) {
     <div><span>Unrounded central return</span><strong>${format_pct(cycle.profit_pct)}</strong></div>
     <div><span>Ending ${escape_html(currency_name(cycle.path[0]))}</span><strong>${format_number(cycle.simulation.end)}</strong></div></div>
     <div class="table-wrap"><table><thead><tr><th>Trade</th><th>Input → output</th><th>Average rate</th><th>Hourly volumes</th><th>Historical output stock</th></tr></thead><tbody>
-    ${cycle.legs.map((leg, i) => `<tr><td>${escape_html(currency_name(leg.from))} → ${escape_html(currency_name(leg.to))}</td>
-      <td>${format_number(cycle.simulation.amounts[i])} → ${format_number(cycle.simulation.amounts[i + 1])}</td>
+    ${cycle.legs.map((leg, i) => `<tr><td>${escape_html(currency_name(leg.from))} → ${escape_html(currency_name(leg.to))}<span class="secondary">${escape_html(leg.vendor ?? 'Currency market')}</span></td>
+      <td>${format_number(cycle.simulation.amounts[i])} → ${format_number(cycle.simulation.amounts[i + 1])}${cycle.simulation.leftovers[i] ? `<span class="secondary">${cycle.simulation.leftovers[i]} input left over, excluded</span>` : ''}</td>
       <td>${leg.rate.toPrecision(6)} per input unit<span class="secondary">${leg.low_rate.toPrecision(5)} to ${leg.high_rate.toPrecision(5)}</span></td>
-      <td>${format_number(leg.input_volume)} input / ${format_number(leg.output_volume)} output</td>
-      <td>${format_number(leg.historical_low_stock)} to ${format_number(leg.historical_high_stock)}</td></tr>`).join('')}</tbody></table></div>
+      <td>${leg.kind === 'vendor' ? 'Fixed batch: ' : 'Hourly: '}${format_number(leg.input_volume)} input / ${format_number(leg.output_volume)} output</td>
+      <td>${leg.kind === 'vendor' ? 'Vendor, no market stock assumption' : `${format_number(leg.historical_low_stock)} to ${format_number(leg.historical_high_stock)}`}</td></tr>`).join('')}</tbody></table></div>
     <p>Return = (ending amount ÷ starting amount − 1) × 100. Gold is excluded. Rates are historical hourly averages; check every leg and its available quantity in game before using this route.</p>
-    ${cycle.legs.some((leg, i) => cycle.simulation.amounts[i] > leg.input_volume) ? '<p>Your modeled trade size exceeds the entire observed hourly input volume on at least one leg. This estimate extrapolates beyond the sample and is especially uncertain.</p>' : ''}`;
+    ${cycle.legs.some((leg, i) => leg.kind !== 'vendor' && cycle.simulation.amounts[i] > leg.input_volume) ? '<p>Your modeled trade size exceeds the entire observed hourly input volume on at least one leg. This estimate extrapolates beyond the sample and is especially uncertain.</p>' : ''}`;
   render_rows();
 }
 
@@ -79,6 +80,7 @@ function render() {
     const median = ranked.length % 2 ? ranked[middle]?.simulation.profit_pct : (ranked[middle - 1]?.simulation.profit_pct + ranked[middle]?.simulation.profit_pct) / 2;
     by_id('median_return').textContent = ranked.length ? format_pct(median) : '—';
     render_rows();
+    render_recipe();
     set_error('');
   } catch (error) {
     set_error(error.message);
@@ -109,6 +111,10 @@ async function load_analysis() {
     const age_hours = (Date.now() / 1000 - analysis.hour - 3600) / 3600;
     by_id('snapshot_time').textContent = `${analysis.realm.toUpperCase()} · ${start.toLocaleString()} – ${end.toLocaleTimeString()} · ${age_hours > 3 ? 'stale snapshot' : 'completed hour'}`;
     by_id('source_link').href = analysis.source_url;
+    const catalog_response = await fetch('./vendor_recipes.json', {cache: 'no-cache'});
+    if (!catalog_response.ok) throw new Error('Vendor catalogue unavailable.');
+    catalog = await catalog_response.json();
+    load_recipes();
     render();
   } catch (error) {
     by_id('snapshot_time').textContent = 'Snapshot unavailable';
@@ -117,9 +123,50 @@ async function load_analysis() {
   }
 }
 
+function currency_list(values) {
+  return Object.entries(values).map(([id, amount]) => `${amount} ${currency_name(id)}`).join(' + ') || 'Item ingredients';
+}
+
+function load_recipes() {
+  const calculable = catalog.recipes.filter(recipe => ['fixed', 'basket', 'item'].includes(recipe.kind));
+  by_id('recipe').innerHTML = calculable.map(recipe => `<option value="${escape_html(recipe.id)}">${escape_html(recipe.name)}</option>`).join('');
+  by_id('recipe_count').textContent = `${catalog.recipes.length} documented entries`;
+  by_id('recipe_rules').textContent = `${catalog.ruleset}. Checked ${catalog.checked_at}. Currency-producing recipes are listed; equipment crafting, divination-card rewards and undisclosed recipes are outside this catalogue. Confirm the sell-window reward before using any item recipe.`;
+  by_id('recipe_catalogue').innerHTML = catalog.recipes.map(recipe => `<tr><td>${escape_html(recipe.name)}</td><td>${Object.keys(recipe.outputs).length ? escape_html(currency_list(recipe.inputs) + ' → ' + currency_list(recipe.outputs)) : 'Variable or unavailable'}</td><td>${escape_html(recipe.requirements)}<span class="secondary">${escape_html(recipe.vendor)}</span></td><td>${escape_html(recipe.kind)}<span class="secondary"><a href="${escape_html(recipe.source)}" target="_blank" rel="noreferrer">Source</a></span></td></tr>`).join('');
+  select_recipe();
+}
+
+function select_recipe() {
+  if (!catalog) return;
+  const recipe = catalog.recipes.find(recipe => recipe.id === by_id('recipe').value);
+  by_id('recipe_item_cost').value = recipe.kind === 'item' ? '' : '0';
+  by_id('recipe_item_cost').disabled = recipe.kind !== 'item';
+  render_recipe();
+}
+
+function render_recipe() {
+  if (!catalog || !analysis) return;
+  const recipe = catalog.recipes.find(recipe => recipe.id === by_id('recipe').value);
+  by_id('recipe_requirements').textContent = `${currency_list(recipe.inputs)} → ${currency_list(recipe.outputs)}. ${recipe.requirements} Vendor: ${recipe.vendor}.`;
+  try {
+    if (by_id('league').value.includes('Ruthless')) throw new Error('This catalogue is for non-Ruthless rules.');
+    if (!by_id('recipe_controls').checkValidity()) throw new Error('Enter the total item ingredient cost per batch, including gems, fragments or equipment.');
+    const league = analysis.leagues.find(league => league.name === by_id('league').value);
+    const result = quote_recipe(recipe, league.edges ?? [], Number(by_id('recipe_batches').value), Number(by_id('recipe_item_cost').value), read_options().haircut_bps);
+    by_id('recipe_result').textContent = `Cost: ${format_number(result.cost)} chaos. Return: ${format_number(result.returned)} chaos. Profit: ${format_number(result.profit)} chaos (${result.profit_pct === null ? 'percentage undefined for zero cost' : format_pct(result.profit_pct)}). Direct historical market quotes with haircut and whole-unit rounding; gold and time excluded.`;
+    by_id('recipe_result').className = result.profit >= 0 ? 'positive' : 'negative';
+  } catch (error) {
+    by_id('recipe_result').textContent = error.message;
+    by_id('recipe_result').className = 'secondary';
+  }
+}
+
+by_id('recipe_controls').addEventListener('submit', event => event.preventDefault());
+by_id('recipe').addEventListener('change', select_recipe);
+for (const id of ['recipe_batches', 'recipe_item_cost']) by_id(id).addEventListener('input', render_recipe);
 by_id('controls').addEventListener('submit', event => event.preventDefault());
 by_id('league').addEventListener('change', () => {update_currencies(); render();});
-for (const id of ['start', 'budget', 'haircut', 'min_profit', 'min_volume']) by_id(id).addEventListener('input', render);
+for (const id of ['start', 'budget', 'haircut', 'min_profit', 'min_volume', 'route_type']) by_id(id).addEventListener('input', render);
 by_id('rows').addEventListener('click', event => {
   const button = event.target.closest('button[data-cycle]');
   if (button) {show_details(Number(button.dataset.cycle)); by_id('details').scrollIntoView({behavior:'smooth', block:'start'});}
