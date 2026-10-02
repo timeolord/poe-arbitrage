@@ -14,13 +14,41 @@ export const currency_name = id => known_names[id.split('/').at(-1)] ?? id.split
 export const has_historical_stock = edge => edge.kind === 'vendor' || edge.historical_low_stock > 0 && edge.historical_high_stock > 0;
 export const profit_pct = rates => (rates.reduce((product, rate) => product * rate, 1) - 1) * 100;
 
+export function gold_cost(id, quantity, fees) {
+  if (!Number.isSafeInteger(quantity) || quantity < 0) throw new Error('Invalid gold fee quantity.');
+  if (quantity === 0) return 0;
+  const fee = fees?.[id]?.fee;
+  if (!fee) return null;
+  if (!Array.isArray(fee) || fee.length !== 2 || !fee.every(Number.isSafeInteger) || fee[0] <= 0 || fee[1] <= 0) throw new Error('Invalid gold fee.');
+  const numerator = BigInt(quantity) * BigInt(fee[0]), denominator = BigInt(fee[1]);
+  const cost = (numerator + denominator - 1n) / denominator;
+  if (cost > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error('Gold cost exceeds supported precision.');
+  return Number(cost);
+}
+
+export function gold_summary(trades, profit, fees) {
+  const leg_costs = trades.map(trade => trade.kind === 'vendor' ? 0 : gold_cost(trade.to, trade.quantity, fees));
+  const missing = [...new Set(trades.filter((trade, i) => leg_costs[i] === null).map(trade => trade.to))];
+  const sum = leg_costs.filter(cost => cost !== null).reduce((sum, cost) => sum + BigInt(cost), 0n);
+  if (sum > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error('Total gold exceeds supported precision.');
+  const total = missing.length ? null : Number(sum);
+  return {leg_costs, missing, total, gold_per_profit: total !== null && profit > 0 ? total / profit : null, profit_per_100k: total > 0 && profit > 0 ? profit * 100000 / total : null};
+}
+
+const within_gold_budget = (simulation, options) => options.gold_budget == null || simulation.gold.total !== null && simulation.gold.total <= options.gold_budget;
+const compare_cycles = options => (a, b) => (options.sort_by === 'gold_efficiency' ? (b.simulation.gold.profit_per_100k ?? -Infinity) - (a.simulation.gold.profit_per_100k ?? -Infinity) : 0) || b.simulation.profit_pct - a.simulation.profit_pct || b.profit_pct - a.profit_pct;
+function validate_gold_options(options) {
+  if (options.gold_budget != null && (!Number.isSafeInteger(options.gold_budget) || options.gold_budget < 0)) throw new Error('Gold budget must be a nonnegative whole number.');
+  if (options.sort_by != null && !['profit', 'gold_efficiency'].includes(options.sort_by)) throw new Error('Invalid sort order.');
+}
+
 export function rotate_cycle(cycle, start) {
   const index = cycle.path.indexOf(start);
   if (index < 0) return null;
   return {...cycle, path: [...cycle.path.slice(index), ...cycle.path.slice(0, index)], legs: [...cycle.legs.slice(index), ...cycle.legs.slice(0, index)]};
 }
 
-export function simulate_cycle(legs, budget, haircut_bps) {
+export function simulate_cycle(legs, budget, haircut_bps, fees = null) {
   if (!Number.isSafeInteger(budget) || budget < 1 || !Number.isInteger(haircut_bps) || haircut_bps < 0 || haircut_bps >= 10000) throw new Error('invalid budget or haircut');
   const amounts = [BigInt(budget)];
   const leftovers = [];
@@ -34,25 +62,29 @@ export function simulate_cycle(legs, budget, haircut_bps) {
     amounts.push(next);
   }
   const end = Number(amounts.at(-1));
-  return {amounts: amounts.map(Number), leftovers, end, profit: end - budget, profit_pct: (end / budget - 1) * 100};
+  return {amounts: amounts.map(Number), leftovers, end, profit: end - budget, profit_pct: (end / budget - 1) * 100,
+    gold: gold_summary(legs.map((leg, i) => ({...leg, quantity:Number(amounts[i + 1])})), end - budget, fees)};
 }
 
 export function rank_cycles(league, options) {
+  validate_gold_options(options);
   return league.cycles.filter(cycle => cycle.path.includes(options.start)).map(cycle => rotate_cycle(cycle, options.start))
     .filter(cycle => options.include_vendors !== false || cycle.legs.every(leg => leg.kind !== 'vendor'))
     .filter(cycle => cycle.legs.every(has_historical_stock))
     .filter(cycle => !options.vendor_only || cycle.legs.some(leg => leg.kind === 'vendor'))
     .filter(cycle => cycle.legs.every(leg => leg.kind === 'vendor' || leg.input_volume >= options.min_volume && leg.output_volume >= options.min_volume))
-    .map(cycle => ({...cycle, simulation: simulate_cycle(cycle.legs, options.budget, options.haircut_bps)}))
+    .map(cycle => ({...cycle, simulation: simulate_cycle(cycle.legs, options.budget, options.haircut_bps, options.gold_fees)}))
     .filter(cycle => cycle.simulation.profit_pct >= options.min_profit)
-    .sort((a, b) => b.simulation.profit_pct - a.simulation.profit_pct || b.profit_pct - a.profit_pct);
+    .filter(cycle => within_gold_budget(cycle.simulation, options))
+    .sort(compare_cycles(options));
 }
 
-export function quote_recipe(recipe, edges, batches, item_cost, haircut_bps) {
+export function quote_recipe(recipe, edges, batches, item_cost, haircut_bps, fees = null) {
   if (!Number.isSafeInteger(batches) || batches < 1 || batches > 1000000 || !Number.isFinite(item_cost) || item_cost < 0 || !Number.isInteger(haircut_bps) || haircut_bps < 0 || haircut_bps >= 10000) throw new Error('Enter valid batch, ingredient cost and haircut amounts.');
   if (!['fixed', 'basket', 'item'].includes(recipe.kind)) throw new Error('This recipe has no deterministic currency return.');
   const chaos = 'Metadata/Items/Currency/CurrencyRerollRare';
   const missing = [];
+  const trades = [];
   const quote = (id, quantity, buying) => {
     if (id === chaos) return quantity;
     const edge = edges.find(edge => edge.kind === 'market' && has_historical_stock(edge) && edge.from === (buying ? chaos : id) && edge.to === (buying ? id : chaos));
@@ -62,15 +94,17 @@ export function quote_recipe(recipe, edges, batches, item_cost, haircut_bps) {
     const denominator = buying ? output * factor : input * 10000n;
     const result = buying ? (numerator + denominator - 1n) / denominator : numerator / denominator;
     if (result > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error('Amount exceeds supported precision.');
+    trades.push({kind:'market', to:buying ? id : chaos, quantity:buying ? quantity : Number(result)});
     return Number(result);
   };
   const cost = Object.entries(recipe.inputs).reduce((sum, [id, amount]) => sum + quote(id, amount * batches, true), item_cost * batches);
   const returned = Object.entries(recipe.outputs).reduce((sum, [id, amount]) => sum + quote(id, amount * batches, false), 0);
   if (missing.length) throw new Error('Missing direct Chaos market quote with positive historical stock: ' + [...new Set(missing)].join(', ') + '. No profit estimate is available.');
-  return {cost, returned, profit: returned - cost, profit_pct: cost > 0 ? (returned / cost - 1) * 100 : null};
+  return {cost, returned, profit: returned - cost, profit_pct: cost > 0 ? (returned / cost - 1) * 100 : null, gold:gold_summary(trades, returned - cost, fees)};
 }
 
 export function search_cycles(league, options) {
+  validate_gold_options(options);
   if (!Number.isInteger(options.max_trades) || options.max_trades < 2 || options.max_trades > 8) throw new Error('Maximum trades must be a whole number from 2 to 8.');
   simulate_cycle([], options.budget, options.haircut_bps);
   if (!Number.isSafeInteger(options.min_volume) || options.min_volume < 1 || !Number.isFinite(options.min_profit)) throw new Error('Invalid volume or profit filter.');
@@ -107,8 +141,8 @@ export function search_cycles(league, options) {
       if (edge.to === options.start) {
         if (length < 2 || !market || options.vendor_only && !vendor) continue;
         legs.push(edge);
-        const simulation = simulate_cycle(legs, options.budget, options.haircut_bps);
-        if (simulation.profit_pct >= options.min_profit) cycles.push({
+        const simulation = simulate_cycle(legs, options.budget, options.haircut_bps, options.gold_fees);
+        if (simulation.profit_pct >= options.min_profit && within_gold_budget(simulation, options)) cycles.push({
           path: [...path], legs: [...legs], simulation,
           profit_pct: profit_pct(legs.map(leg => leg.rate)),
           low_profit_pct: profit_pct(legs.map(leg => leg.low_rate)),
@@ -124,6 +158,6 @@ export function search_cycles(league, options) {
     }
   }
   walk(options.start, false, false);
-  cycles.sort((a, b) => b.simulation.profit_pct - a.simulation.profit_pct || b.profit_pct - a.profit_pct);
+  cycles.sort(compare_cycles(options));
   return {cycles, complete, visited};
 }

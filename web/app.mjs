@@ -1,4 +1,4 @@
-import {currency_name, search_cycles, quote_recipe} from './core.mjs?v=stock-filter-v1';
+import {currency_name, search_cycles, quote_recipe} from './core.mjs?v=gold-fees-v1';
 
 const by_id = id => document.getElementById(id);
 const format_number = value => new Intl.NumberFormat(undefined, {maximumFractionDigits: 2}).format(value);
@@ -7,6 +7,9 @@ const escape_html = text => String(text).replace(/[&<>"']/g, character => ({'&':
 const route_html = path => `<div class="route">${[...path, path[0]].map(currency_name).map(escape_html).join('<span>→</span>')}</div>`;
 let analysis;
 let catalog;
+let fee_catalog;
+const format_gold = value => value === null ? 'Unavailable' : format_number(value);
+const gold_efficiency_text = (gold, currency) => gold.gold_per_profit === null ? 'Gold efficiency unavailable' : `${format_number(gold.gold_per_profit)} gold per ${currency} earned; ${gold.profit_per_100k === null ? 'no gold required' : `${format_number(gold.profit_per_100k)} ${currency} earned per 100,000 gold`}`;
 let ranked = [];
 let page_size = 40;
 let selected_index = null;
@@ -20,6 +23,9 @@ function set_error(message) {
 function read_options() {
   if (!by_id('controls').checkValidity()) throw new Error('Enter valid numbers in each field.');
   const options = {max_trades: Number(by_id('max_trades').value), start: by_id('start').value, budget: Number(by_id('budget').value), haircut_bps: Math.round(Number(by_id('haircut').value) * 100), min_volume: Number(by_id('min_volume').value), min_profit: Number(by_id('min_profit').value), include_vendors: by_id('route_type').value !== 'market', vendor_only: by_id('route_type').value === 'vendor'};
+  options.gold_budget = by_id('gold_budget').value === '' ? null : Number(by_id('gold_budget').value);
+  options.sort_by = by_id('sort_by').value;
+  options.gold_fees = fee_catalog.items;
   if (!Number.isSafeInteger(options.min_volume) || options.min_volume < 1) throw new Error('Minimum volume must be a positive whole number.');
   return options;
 }
@@ -38,6 +44,8 @@ function render_rows() {
     <td>${route_html(cycle.path)}<span class="secondary">${cycle.legs.filter(leg => leg.kind === 'vendor').length} vendor / ${cycle.legs.filter(leg => leg.kind !== 'vendor').length} market trades</span></td>
     <td><span class="profit ${cycle.simulation.profit_pct >= 0 ? 'positive' : 'negative'}">${format_pct(cycle.simulation.profit_pct)}</span><span class="secondary">after rounding &amp; haircut</span></td>
     <td>${format_number(cycle.simulation.end)}</td><td>${cycle.simulation.profit >= 0 ? '+' : ''}${format_number(cycle.simulation.profit)}</td>
+    <td>${format_gold(cycle.simulation.gold.total)}<span class="secondary">estimated gold</span></td>
+    <td>${format_gold(cycle.simulation.gold.gold_per_profit)}<span class="secondary">per ${escape_html(currency_name(cycle.path[0]))} earned</span></td>
     <td>${format_pct(cycle.low_profit_pct)} to ${format_pct(cycle.high_profit_pct)}<span class="secondary">unrounded, before haircut</span></td>
     <td><button type="button" data-cycle="${index}" aria-label="Inspect cycle ${index + 1}">Inspect</button></td></tr>`).join('');
   by_id('empty').hidden = ranked.length !== 0;
@@ -52,14 +60,19 @@ function show_details(index) {
   by_id('detail_content').innerHTML = `${route_html(cycle.path)}<div class="detail-stats">
     <div><span>Modeled cycle profit</span><strong class="${cycle.simulation.profit_pct >= 0 ? 'positive' : 'negative'}">${format_pct(cycle.simulation.profit_pct)}</strong></div>
     <div><span>Unrounded central return</span><strong>${format_pct(cycle.profit_pct)}</strong></div>
-    <div><span>Ending ${escape_html(currency_name(cycle.path[0]))}</span><strong>${format_number(cycle.simulation.end)}</strong></div></div>
-    <div class="table-wrap"><table><thead><tr><th>Trade</th><th>Input → output</th><th>Average rate</th><th>Hourly volumes</th><th>Historical output stock</th></tr></thead><tbody>
+    <div><span>Ending ${escape_html(currency_name(cycle.path[0]))}</span><strong>${format_number(cycle.simulation.end)}</strong></div>
+    <div><span>Estimated gold total</span><strong>${format_gold(cycle.simulation.gold.total)}</strong></div>
+    <div><span>Gold per ${escape_html(currency_name(cycle.path[0]))} earned</span><strong>${format_gold(cycle.simulation.gold.gold_per_profit)}</strong></div>
+    <div><span>${escape_html(currency_name(cycle.path[0]))} earned per 100,000 gold</span><strong>${format_gold(cycle.simulation.gold.profit_per_100k)}</strong></div></div>
+    <div class="table-wrap"><table><thead><tr><th>Trade</th><th>Input → output</th><th>Estimated gold</th><th>Average rate</th><th>Hourly volumes</th><th>Historical output stock</th></tr></thead><tbody>
     ${cycle.legs.map((leg, i) => `<tr><td>${escape_html(currency_name(leg.from))} → ${escape_html(currency_name(leg.to))}<span class="secondary">${escape_html(leg.vendor ?? 'Currency market')}</span></td>
       <td>${format_number(cycle.simulation.amounts[i])} → ${format_number(cycle.simulation.amounts[i + 1])}${cycle.simulation.leftovers[i] ? `<span class="secondary">${cycle.simulation.leftovers[i]} input left over, excluded</span>` : ''}</td>
+      <td>${format_gold(cycle.simulation.gold.leg_costs[i])}<span class="secondary">${leg.kind === 'vendor' ? 'No exchange fee' : 'Fee on received currency'}</span></td>
       <td>${leg.rate.toPrecision(6)} per input unit<span class="secondary">${leg.low_rate.toPrecision(5)} to ${leg.high_rate.toPrecision(5)}</span></td>
       <td>${leg.kind === 'vendor' ? 'Fixed batch: ' : 'Hourly: '}${format_number(leg.input_volume)} input / ${format_number(leg.output_volume)} output</td>
       <td>${leg.kind === 'vendor' ? 'Vendor, no market stock assumption' : `${format_number(leg.historical_low_stock)} to ${format_number(leg.historical_high_stock)}`}</td></tr>`).join('')}</tbody></table></div>
-    <p>Return = (ending amount ÷ starting amount − 1) × 100. Gold is excluded. Rates are historical hourly averages; check every leg and its available quantity in game before using this route.</p>
+    <p>Return = (ending amount ÷ starting amount − 1) × 100. Gold efficiency divides the total gold cost by the profit, excluding your starting balance. Gold is a separate expense and does not reduce the displayed currency amount.</p>
+    <p>Gold estimates use the ${escape_html(fee_catalog.patch)} fee table, reviewed ${escape_html(fee_catalog.reviewed_at)}, and round each market fee up. ${cycle.simulation.gold.missing.length ? `Missing fees: ${cycle.simulation.gold.missing.map(currency_name).map(escape_html).join(', ')}. The total and efficiency are unavailable.` : 'One listing per market leg is assumed; cancellations and reposting are excluded.'} Rates are historical hourly averages; check each order and its gold fee in game.</p>
     ${cycle.legs.some((leg, i) => leg.kind !== 'vendor' && cycle.simulation.amounts[i] > leg.input_volume) ? '<p>Your modeled trade size exceeds the entire observed hourly input volume on at least one leg. This estimate extrapolates beyond the sample and is especially uncertain.</p>' : ''}`;
   render_rows();
 }
@@ -69,10 +82,11 @@ function finish_render(league, result) {
   by_id('search_status').textContent = result.complete ? `Searched cycles of 2–${by_id('max_trades').value} trades, including the return trade.` : 'Partial results: search limit reached. Lower maximum trades or raise minimum volume. Statistics describe only the cycles found.';
   by_id('cycle_count').textContent = format_number(ranked.length);
   by_id('pair_count').textContent = format_number(league.active_pairs);
-  by_id('best_return').textContent = ranked.length ? format_pct(ranked[0].simulation.profit_pct) : '—';
-  by_id('best_return').className = ranked.length && ranked[0].simulation.profit_pct >= 0 ? 'positive' : '';
+  const returns = ranked.map(cycle => cycle.simulation.profit_pct).sort((a,b) => b-a);
+  by_id('best_return').textContent = ranked.length ? format_pct(returns[0]) : '—';
+  by_id('best_return').className = ranked.length && returns[0] >= 0 ? 'positive' : '';
   const middle = Math.floor(ranked.length / 2);
-  const median = ranked.length % 2 ? ranked[middle]?.simulation.profit_pct : (ranked[middle - 1]?.simulation.profit_pct + ranked[middle]?.simulation.profit_pct) / 2;
+  const median = ranked.length % 2 ? returns[middle] : (returns[middle - 1] + returns[middle]) / 2;
   by_id('median_return').textContent = ranked.length ? format_pct(median) : '—';
   render_rows();
 }
@@ -106,7 +120,7 @@ function render() {
       finish_render(league, search_cycles(league, options));
       return;
     }
-    const worker = new Worker('./search_worker.mjs?v=stock-filter-v1', {type: 'module'});
+    const worker = new Worker('./search_worker.mjs?v=gold-fees-v1', {type: 'module'});
     search_worker = worker;
     worker.onmessage = ({data}) => {
       if (search_worker !== worker) return;
@@ -149,6 +163,11 @@ async function load_analysis() {
     const catalog_response = await fetch('./vendor_recipes.json', {cache: 'no-cache'});
     if (!catalog_response.ok) throw new Error('Vendor catalogue unavailable.');
     catalog = await catalog_response.json();
+    const fee_response = await fetch('./gold_fees.json', {cache:'no-cache'});
+    if (!fee_response.ok) throw new Error('Gold fee table unavailable.');
+    fee_catalog = await fee_response.json();
+    if (fee_catalog.schema_version !== 1 || !fee_catalog.items || typeof fee_catalog.items !== 'object') throw new Error('Unsupported gold fee table.');
+    by_id('gold_source').textContent = `Gold fees: PoEDB, patch ${fee_catalog.patch}, reviewed ${fee_catalog.reviewed_at}.`;
     load_recipes();
     render();
   } catch (error) {
@@ -185,8 +204,9 @@ function render_recipe() {
     if (by_id('league').value.includes('Ruthless')) throw new Error('This catalogue is for non-Ruthless rules.');
     if (!by_id('recipe_controls').checkValidity()) throw new Error('Enter a valid whole number of batches.');
     const league = analysis.leagues.find(league => league.name === by_id('league').value);
-    const result = quote_recipe(recipe, league.edges ?? [], Number(by_id('recipe_batches').value), 0, read_options().haircut_bps);
-    by_id('recipe_result').textContent = `Cost: ${format_number(result.cost)} chaos. Return: ${format_number(result.returned)} chaos. Profit: ${format_number(result.profit)} chaos (${result.profit_pct === null ? 'percentage undefined for zero cost' : format_pct(result.profit_pct)}). Direct historical market quotes with haircut and whole-unit rounding; gold and time excluded.`;
+    const options = read_options();
+    const result = quote_recipe(recipe, league.edges ?? [], Number(by_id('recipe_batches').value), 0, options.haircut_bps, fee_catalog.items);
+    by_id('recipe_result').textContent = `Cost: ${format_number(result.cost)} chaos. Return: ${format_number(result.returned)} chaos. Profit: ${format_number(result.profit)} chaos (${result.profit_pct === null ? 'percentage undefined for zero cost' : format_pct(result.profit_pct)}). Estimated gold: ${format_gold(result.gold.total)}. ${gold_efficiency_text(result.gold, 'Chaos Orb')}. ${result.gold.missing.length ? `Missing fees: ${result.gold.missing.map(currency_name).join(', ')}. ` : ''}${options.gold_budget !== null && (result.gold.total === null || result.gold.total > options.gold_budget) ? 'This recipe does not meet your gold budget. ' : ''}Direct historical quotes with haircut and whole-unit rounding; one listing per market quote, time excluded.`;
     by_id('recipe_result').className = result.profit >= 0 ? 'positive' : 'negative';
   } catch (error) {
     by_id('recipe_result').textContent = error.message;
@@ -199,7 +219,7 @@ by_id('recipe').addEventListener('change', select_recipe);
 for (const id of ['recipe_batches']) by_id(id).addEventListener('input', render_recipe);
 by_id('controls').addEventListener('submit', event => event.preventDefault());
 by_id('league').addEventListener('change', () => {update_currencies(); render();});
-for (const id of ['start', 'budget', 'haircut', 'min_profit', 'min_volume', 'max_trades', 'route_type']) by_id(id).addEventListener('input', render);
+for (const id of ['start', 'budget', 'haircut', 'min_profit', 'min_volume', 'max_trades', 'route_type', 'gold_budget', 'sort_by']) by_id(id).addEventListener('input', render);
 by_id('rows').addEventListener('click', event => {
   const button = event.target.closest('button[data-cycle]');
   if (button) {show_details(Number(button.dataset.cycle)); by_id('details').scrollIntoView({behavior:'smooth', block:'start'});}
