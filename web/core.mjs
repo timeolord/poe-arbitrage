@@ -67,3 +67,60 @@ export function quote_recipe(recipe, edges, batches, item_cost, haircut_bps) {
   if (missing.length) throw new Error('Missing direct Chaos market quote: ' + [...new Set(missing)].join(', ') + '. No profit estimate is available.');
   return {cost, returned, profit: returned - cost, profit_pct: cost > 0 ? (returned / cost - 1) * 100 : null};
 }
+
+export function search_cycles(league, options) {
+  if (!Number.isInteger(options.max_trades) || options.max_trades < 2 || options.max_trades > 8) throw new Error('Maximum trades must be a whole number from 2 to 8.');
+  simulate_cycle([], options.budget, options.haircut_bps);
+  if (!Number.isSafeInteger(options.min_volume) || options.min_volume < 1 || !Number.isFinite(options.min_profit)) throw new Error('Invalid volume or profit filter.');
+  if (!Array.isArray(league.edges)) throw new Error('The snapshot has no currency graph.');
+  const graph = new Map(), reverse = new Map();
+  for (const edge of league.edges) {
+    if (edge.kind === 'vendor' ? options.include_vendors === false : edge.input_volume < options.min_volume || edge.output_volume < options.min_volume) continue;
+    if (!graph.has(edge.from)) graph.set(edge.from, []);
+    graph.get(edge.from).push(edge);
+    if (!reverse.has(edge.to)) reverse.set(edge.to, []);
+    reverse.get(edge.to).push(edge.from);
+  }
+  const distance = new Map([[options.start, 0]]), queue = [options.start];
+  for (let i = 0; i < queue.length; i++) {
+    for (const from of reverse.get(queue[i]) ?? []) {
+      if (distance.has(from)) continue;
+      distance.set(from, distance.get(queue[i]) + 1);
+      queue.push(from);
+    }
+  }
+  const cycles = [], path = [options.start], legs = [], seen = new Set(path);
+  const max_checks = options.max_checks ?? 2000000;
+  const max_results = options.max_results ?? 25000;
+  if (!Number.isSafeInteger(max_checks) || max_checks < 1 || !Number.isSafeInteger(max_results) || max_results < 1) throw new Error('Invalid search limit.');
+  let visited = 0, complete = true;
+  function walk(current, has_market, has_vendor) {
+    for (const edge of graph.get(current) ?? []) {
+      if (visited >= max_checks || cycles.length >= max_results) {complete = false; return;}
+      visited++;
+      const length = legs.length + 1;
+      const market = has_market || edge.kind !== 'vendor';
+      const vendor = has_vendor || edge.kind === 'vendor';
+      if (edge.to === options.start) {
+        if (length < 2 || !market || options.vendor_only && !vendor) continue;
+        legs.push(edge);
+        const simulation = simulate_cycle(legs, options.budget, options.haircut_bps);
+        if (simulation.profit_pct >= options.min_profit) cycles.push({
+          path: [...path], legs: [...legs], simulation,
+          profit_pct: profit_pct(legs.map(leg => leg.rate)),
+          low_profit_pct: profit_pct(legs.map(leg => leg.low_rate)),
+          high_profit_pct: profit_pct(legs.map(leg => leg.high_rate)),
+        });
+        legs.pop();
+      } else if (length < options.max_trades && !seen.has(edge.to) && length + (distance.get(edge.to) ?? Infinity) <= options.max_trades) {
+        legs.push(edge); path.push(edge.to); seen.add(edge.to);
+        walk(edge.to, market, vendor);
+        seen.delete(edge.to); path.pop(); legs.pop();
+        if (!complete) return;
+      }
+    }
+  }
+  walk(options.start, false, false);
+  cycles.sort((a, b) => b.simulation.profit_pct - a.simulation.profit_pct || b.profit_pct - a.profit_pct);
+  return {cycles, complete, visited};
+}

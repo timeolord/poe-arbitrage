@@ -1,4 +1,4 @@
-import {currency_name, rank_cycles, quote_recipe} from './core.mjs?v=vendors1';
+import {currency_name, search_cycles, quote_recipe} from './core.mjs?v=audit329-v1';
 
 const by_id = id => document.getElementById(id);
 const format_number = value => new Intl.NumberFormat(undefined, {maximumFractionDigits: 2}).format(value);
@@ -10,6 +10,7 @@ let catalog;
 let ranked = [];
 let page_size = 40;
 let selected_index = null;
+let search_worker;
 
 function set_error(message) {
   by_id('error').hidden = !message;
@@ -18,7 +19,7 @@ function set_error(message) {
 
 function read_options() {
   if (!by_id('controls').checkValidity()) throw new Error('Enter valid numbers in each field.');
-  const options = {start: by_id('start').value, budget: Number(by_id('budget').value), haircut_bps: Math.round(Number(by_id('haircut').value) * 100), min_volume: Number(by_id('min_volume').value), min_profit: Number(by_id('min_profit').value), include_vendors: by_id('route_type').value !== 'market', vendor_only: by_id('route_type').value === 'vendor'};
+  const options = {max_trades: Number(by_id('max_trades').value), start: by_id('start').value, budget: Number(by_id('budget').value), haircut_bps: Math.round(Number(by_id('haircut').value) * 100), min_volume: Number(by_id('min_volume').value), min_profit: Number(by_id('min_profit').value), include_vendors: by_id('route_type').value !== 'market', vendor_only: by_id('route_type').value === 'vendor'};
   if (!Number.isSafeInteger(options.min_volume) || options.min_volume < 1) throw new Error('Minimum volume must be a positive whole number.');
   return options;
 }
@@ -63,32 +64,66 @@ function show_details(index) {
   render_rows();
 }
 
+function finish_render(league, result) {
+  ranked = result.cycles;
+  by_id('search_status').textContent = result.complete ? `Searched cycles of 2–${by_id('max_trades').value} trades, including the return trade.` : 'Partial results: search limit reached. Lower maximum trades or raise minimum volume. Statistics describe only the cycles found.';
+  by_id('cycle_count').textContent = format_number(ranked.length);
+  by_id('pair_count').textContent = format_number(league.active_pairs);
+  by_id('best_return').textContent = ranked.length ? format_pct(ranked[0].simulation.profit_pct) : '—';
+  by_id('best_return').className = ranked.length && ranked[0].simulation.profit_pct >= 0 ? 'positive' : '';
+  const middle = Math.floor(ranked.length / 2);
+  const median = ranked.length % 2 ? ranked[middle]?.simulation.profit_pct : (ranked[middle - 1]?.simulation.profit_pct + ranked[middle]?.simulation.profit_pct) / 2;
+  by_id('median_return').textContent = ranked.length ? format_pct(median) : '—';
+  render_rows();
+}
+
+function search_error(error) {
+  set_error(error.message);
+  by_id('search_status').textContent = 'Search unavailable.';
+  ranked = [];
+  render_rows();
+}
+
 function render() {
   if (!analysis) return;
+  search_worker?.terminate();
+  search_worker = null;
+  ranked = [];
+  page_size = 40;
+  selected_index = null;
+  by_id('details').hidden = true;
+  for (const id of ['cycle_count', 'best_return', 'median_return', 'pair_count']) by_id(id).textContent = '—';
+  render_rows();
   try {
     const options = read_options();
     const league = analysis.leagues.find(league => league.name === by_id('league').value);
-    ranked = rank_cycles(league, options);
-    page_size = 40;
-    selected_index = null;
-    by_id('details').hidden = true;
-    by_id('cycle_count').textContent = format_number(ranked.length);
-    by_id('pair_count').textContent = format_number(league.active_pairs);
-    by_id('best_return').textContent = ranked.length ? format_pct(ranked[0].simulation.profit_pct) : '—';
-    by_id('best_return').className = ranked.length && ranked[0].simulation.profit_pct >= 0 ? 'positive' : '';
-    const middle = Math.floor(ranked.length / 2);
-    const median = ranked.length % 2 ? ranked[middle]?.simulation.profit_pct : (ranked[middle - 1]?.simulation.profit_pct + ranked[middle]?.simulation.profit_pct) / 2;
-    by_id('median_return').textContent = ranked.length ? format_pct(median) : '—';
-    render_rows();
     render_recipe();
     set_error('');
+    by_id('search_status').textContent = `Searching cycles up to ${options.max_trades} trades…`;
+    by_id('empty').hidden = true;
+    by_id('result_count').textContent = 'Searching…';
+    if (typeof Worker === 'undefined') {
+      finish_render(league, search_cycles(league, options));
+      return;
+    }
+    const worker = new Worker('./search_worker.mjs?v=audit329-v1', {type: 'module'});
+    search_worker = worker;
+    worker.onmessage = ({data}) => {
+      if (search_worker !== worker) return;
+      worker.terminate();
+      search_worker = null;
+      if (data.error) search_error(new Error(data.error));
+      else finish_render(league, data);
+    };
+    worker.onerror = () => {
+      if (search_worker !== worker) return;
+      worker.terminate();
+      search_worker = null;
+      search_error(new Error('Background search failed. Reload the page to retry.'));
+    };
+    worker.postMessage({league: {edges: league.edges}, options});
   } catch (error) {
-    set_error(error.message);
-    ranked = [];
-    selected_index = null;
-    by_id('details').hidden = true;
-    for (const id of ['cycle_count', 'best_return', 'median_return', 'pair_count']) by_id(id).textContent = '—';
-    render_rows();
+    search_error(error);
   }
 }
 
@@ -131,8 +166,8 @@ function load_recipes() {
   const calculable = catalog.recipes.filter(recipe => ['fixed', 'basket'].includes(recipe.kind));
   by_id('recipe').innerHTML = calculable.map(recipe => `<option value="${escape_html(recipe.id)}">${escape_html(recipe.name)}</option>`).join('');
   by_id('recipe_count').textContent = `${catalog.recipes.length} currency exchanges`;
-  by_id('recipe_rules').textContent = `${catalog.ruleset}. Checked ${catalog.checked_at}. Only deterministic currency-to-currency recipes are listed. Quoted adjacent essence upgrades are also included in the cycle scanner.`;
-  by_id('recipe_catalogue').innerHTML = catalog.recipes.map(recipe => `<tr><td>${escape_html(recipe.name)}</td><td>${Object.keys(recipe.outputs).length ? escape_html(currency_list(recipe.inputs) + ' → ' + currency_list(recipe.outputs)) : 'Variable or unavailable'}</td><td>${escape_html(recipe.requirements)}<span class="secondary">${escape_html(recipe.vendor)}</span></td><td>${escape_html(recipe.kind)}<span class="secondary"><a href="${escape_html(recipe.source)}" target="_blank" rel="noreferrer">Source</a></span></td></tr>`).join('');
+  by_id('recipe_rules').textContent = `${catalog.ruleset}. Checked ${catalog.checked_at}. ${catalog.verification} Only deterministic currency-to-currency recipes are listed. Quoted adjacent essence upgrades are also included in the cycle scanner.`;
+  by_id('recipe_catalogue').innerHTML = catalog.recipes.map(recipe => `<tr><td>${escape_html(recipe.name)}</td><td>${Object.keys(recipe.outputs).length ? escape_html(currency_list(recipe.inputs) + ' → ' + currency_list(recipe.outputs)) : 'Variable or unavailable'}</td><td>${escape_html(recipe.requirements)}<span class="secondary">${escape_html(recipe.vendor)}</span></td><td>${escape_html(recipe.kind + " / 3.29 reviewed")}<span class="secondary"><a href="${escape_html(recipe.source)}" target="_blank" rel="noreferrer">Rate source</a> · <a href="${escape_html(catalog.patch_source)}" target="_blank" rel="noreferrer">Patch notes</a></span></td></tr>`).join('');
   select_recipe();
 }
 
@@ -164,7 +199,7 @@ by_id('recipe').addEventListener('change', select_recipe);
 for (const id of ['recipe_batches']) by_id(id).addEventListener('input', render_recipe);
 by_id('controls').addEventListener('submit', event => event.preventDefault());
 by_id('league').addEventListener('change', () => {update_currencies(); render();});
-for (const id of ['start', 'budget', 'haircut', 'min_profit', 'min_volume', 'route_type']) by_id(id).addEventListener('input', render);
+for (const id of ['start', 'budget', 'haircut', 'min_profit', 'min_volume', 'max_trades', 'route_type']) by_id(id).addEventListener('input', render);
 by_id('rows').addEventListener('click', event => {
   const button = event.target.closest('button[data-cycle]');
   if (button) {show_details(Number(button.dataset.cycle)); by_id('details').scrollIntoView({behavior:'smooth', block:'start'});}
