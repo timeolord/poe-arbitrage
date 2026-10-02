@@ -45,7 +45,9 @@ test('recipe basket values every input and output and rejects missing quotes', a
   const chaos = 'Metadata/Items/Currency/CurrencyRerollRare';
   const edges = [{...leg(chaos,'a',3,2),kind:'market'}, {...leg('b',chaos,2,7),kind:'market'}, {...leg('c',chaos,1,3),kind:'market'}];
   const recipe = {kind:'item', inputs:{a:3}, outputs:{b:3,c:1}};
-  assert.deepEqual(quote_recipe(recipe,edges,1,2,0), {cost:7,returned:13,profit:6,profit_pct:(13/7-1)*100});
+  const {gold, ...quote} = quote_recipe(recipe,edges,1,2,0);
+  assert.deepEqual(quote, {cost:7,returned:13,profit:6,profit_pct:(13/7-1)*100});
+  assert.equal(gold.total, null);
   assert.equal(quote_recipe(recipe,edges,1,2,1000).cost, 7);
   assert.equal(quote_recipe(recipe,edges,1,2,1000).returned, 11);
   assert.throws(() => quote_recipe(recipe,edges.slice(0,2),1,2,0), /Missing direct Chaos/);
@@ -94,4 +96,78 @@ test('zero or missing stock excludes market legs but preserves vendors', async (
   const chaos = 'Metadata/Items/Currency/CurrencyRerollRare';
   const recipe = {kind:'fixed',inputs:{a:1},outputs:{[chaos]:1}};
   assert.throws(()=>quote_recipe(recipe,[{...leg(chaos,'a',1,1),kind:'market',historical_low_stock:0}],1,0,0),/positive historical stock/);
+});
+
+test('gold costs follow received quantities, round fractions up, and preserve precision', async () => {
+  const {gold_cost, gold_summary} = await import('../web/core.mjs');
+  const fees = {a:{fee:[15,1]}, b:{fee:[1,8]}};
+  assert.equal(gold_cost('a',10,fees),150);
+  assert.equal(gold_cost('b',9,fees),2);
+  assert.equal(gold_cost('unknown',1,fees),null);
+  assert.equal(gold_cost('unknown',0,fees),0);
+  assert.throws(()=>gold_cost('a',-1,fees),/quantity/);
+  assert.throws(()=>gold_cost('a',Number.MAX_SAFE_INTEGER,fees),/precision/);
+  assert.throws(()=>gold_cost('a',1,{a:{fee:[1,0]}}),/Invalid gold fee/);
+  assert.throws(()=>gold_summary([{to:'a',quantity:Number.MAX_SAFE_INTEGER},{to:'a',quantity:1}],1,{a:{fee:[1,1]}}),/Total gold/);
+});
+
+test('cycle gold includes the closing trade and excludes vendor fees', () => {
+  const fees = {a:{fee:[15,1]}, b:{fee:[20,1]}};
+  const legs = [leg('a','b',1,2),leg('b','a',10,6)];
+  const result = simulate_cycle(legs,100,0,fees);
+  assert.deepEqual(result.gold.leg_costs,[4000,1800]);
+  assert.equal(result.gold.total,5800);
+  assert.equal(result.gold.gold_per_profit,290);
+  assert.equal(result.gold.profit_per_100k,20*100000/5800);
+  assert.deepEqual(simulate_cycle(legs,100,100,fees).gold.leg_costs,[3960,1755]);
+  const vendor = {...legs[0],kind:'vendor'};
+  assert.deepEqual(simulate_cycle([vendor,legs[1]],100,0,fees).gold.leg_costs,[0,1800]);
+  assert.equal(simulate_cycle([leg('a','a',1,1)],100,0,fees).gold.gold_per_profit,null);
+  assert.equal(simulate_cycle([leg('a','a',2,1)],100,0,fees).gold.profit_per_100k,null);
+  const unknown = simulate_cycle(legs,100,0,{a:fees.a});
+  assert.equal(unknown.gold.total,null);
+  assert.deepEqual(unknown.gold.missing,['b']);
+});
+
+test('gold budgets and efficiency sorting apply to graph and saved cycle searches', async () => {
+  const {search_cycles} = await import('../web/core.mjs');
+  const edge = (from,to,x,y)=>({...leg(from,to,x,y),kind:'market',rate:y/x,low_rate:y/x,high_rate:y/x});
+  const first = [edge('a','b',1,2),edge('b','a',10,6)];
+  const second = [edge('a','c',1,1),edge('c','a',10,11)];
+  const unknown = [edge('a','d',1,3),edge('d','a',1,1)];
+  const league = {edges:[...first,...second,...unknown],cycles:[first,second,unknown].map(legs=>({path:legs.map(e=>e.from),legs,profit_pct:profit_pct(legs.map(e=>e.rate))}))};
+  const options = {start:'a',budget:100,haircut_bps:0,min_volume:1,min_profit:1,max_trades:2,gold_fees:{a:{fee:[1,1]},b:{fee:[100,1]},c:{fee:[1,1]}}};
+  for (const search of [o=>search_cycles(league,o).cycles,o=>rank_cycles(league,o)]) {
+    assert.deepEqual(search({...options,sort_by:'gold_efficiency'}).map(c=>c.path[1]),['c','b','d']);
+    assert.deepEqual(search({...options,sort_by:'profit'}).map(c=>c.path[1]),['d','b','c']);
+    assert.deepEqual(search({...options,gold_budget:210}).map(c=>c.path[1]),['c']);
+    assert.equal(search({...options,gold_budget:209}).length,0);
+    assert.equal(search({...options,gold_budget:0}).length,0);
+    assert.throws(()=>search({...options,gold_budget:-1}),/Gold budget/);
+    assert.throws(()=>search({...options,sort_by:'invalid'}),/sort order/);
+  }
+});
+
+test('recipe gold charges each market purchase and sale but skips direct Chaos', async () => {
+  const {quote_recipe} = await import('../web/core.mjs');
+  const chaos = 'Metadata/Items/Currency/CurrencyRerollRare';
+  const edges = [{...leg(chaos,'a',3,2),kind:'market'}, {...leg('b',chaos,2,7),kind:'market'}];
+  const recipe = {kind:'basket',inputs:{a:3,[chaos]:1},outputs:{b:3,[chaos]:2}};
+  const result = quote_recipe(recipe,edges,1,0,0,{a:{fee:[20,1]},[chaos]:{fee:[15,1]}});
+  assert.equal(result.profit,6);
+  assert.deepEqual(result.gold.leg_costs,[60,150]);
+  assert.equal(result.gold.total,210);
+  assert.equal(result.gold.gold_per_profit,35);
+});
+
+test('fee table records current patch sources and the revised Chromatic fee', async () => {
+  const {readFile} = await import('node:fs/promises');
+  const {gold_cost} = await import('../web/core.mjs');
+  const table = JSON.parse(await readFile(new URL('../web/gold_fees.json', import.meta.url)));
+  assert.equal(table.patch,'3.29');
+  assert.equal(table.source_url,'https://poedb.tw/us/Currency_Exchange');
+  assert.equal(gold_cost('Metadata/Items/Currency/CurrencyRerollSocketColours',1,table.items),20);
+  assert.equal(gold_cost('Metadata/Items/Currency/CurrencyModValues',1,table.items),250);
+  assert.equal(gold_cost('Metadata/Items/Currency/HarvestSeedBlue',9,table.items),2);
+  for (const [id,item] of Object.entries(table.items)) assert.ok(Number.isSafeInteger(gold_cost(id,100,item && table.items)));
 });
