@@ -1,0 +1,3195 @@
+{
+  "schema_version": 1,
+  "patch": "3.29",
+  "reviewed_at": "2026-10-02",
+  "source_url": "https://poedb.tw/us/Currency_Exchange",
+  "item_ids_source": "https://repoe-fork.github.io/base_items.json",
+  "rounding": "ceiling per market leg, conservative estimate",
+  "items": {
+    "Metadata/Items/Currency/CurrencyWeaponQuality": {
+      "name": "Blacksmith's Whetstone",
+      "fee": [
+        30,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyIdentification": {
+      "name": "Scroll of Wisdom",
+      "fee": [
+        1,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRerollRare": {
+      "name": "Chaos Orb",
+      "fee": [
+        15,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRerollRareVeiled": {
+      "name": "Veiled Exalted Orb",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRerollRareVeiledChaos": {
+      "name": "Veiled Chaos Orb",
+      "fee": [
+        250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyArmourQuality": {
+      "name": "Armourer's Scrap",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDuplicate": {
+      "name": "Mirror of Kalandra",
+      "fee": [
+        25000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": {
+      "name": "Orb of Alchemy",
+      "fee": [
+        15,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyUpgradeRandomly": {
+      "name": "Orb of Chance",
+      "fee": [
+        10,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyPassiveRefund": {
+      "name": "Orb of Regret",
+      "fee": [
+        20,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAtlasPassiveRefund": {
+      "name": "Orb of Unmaking",
+      "fee": [
+        20,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyUpgradeToMagic": {
+      "name": "Orb of Transmutation",
+      "fee": [
+        3,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRerollMagic": {
+      "name": "Orb of Alteration",
+      "fee": [
+        10,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyConvertToNormal": {
+      "name": "Orb of Scouring",
+      "fee": [
+        15,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAddModToRare": {
+      "name": "Exalted Orb",
+      "fee": [
+        20,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": {
+      "name": "Regal Orb",
+      "fee": [
+        20,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAddModToMagic": {
+      "name": "Orb of Augmentation",
+      "fee": [
+        5,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyPortal": {
+      "name": "Portal Scroll",
+      "fee": [
+        1,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyFlaskQuality": {
+      "name": "Glassblower's Bauble",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyGemQuality": {
+      "name": "Gemcutter's Prism",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRerollSocketColours": {
+      "name": "Chromatic Orb",
+      "fee": [
+        20,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRerollSocketLinks": {
+      "name": "Orb of Fusing",
+      "fee": [
+        15,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRerollSocketNumbers": {
+      "name": "Jeweller's Orb",
+      "fee": [
+        10,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyModValues": {
+      "name": "Divine Orb",
+      "fee": [
+        250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRerollImplicit": {
+      "name": "Blessed Orb",
+      "fee": [
+        35,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRerollDefences": {
+      "name": "Sacred Orb",
+      "fee": [
+        250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyMapQualityRarity": {
+      "name": "Maven's Chisel of Procurement",
+      "fee": [
+        200,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyMapQualityPackSize": {
+      "name": "Maven's Chisel of Proliferation",
+      "fee": [
+        200,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyMapQualityDivinationCards": {
+      "name": "Maven's Chisel of Divination",
+      "fee": [
+        200,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyMapQualityScarabs": {
+      "name": "Maven's Chisel of Scarabs",
+      "fee": [
+        200,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyMapQualityCurrency": {
+      "name": "Maven's Chisel of Avarice",
+      "fee": [
+        200,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyUpgradeToMagicShard": {
+      "name": "Transmutation Shard",
+      "fee": [
+        1,
+        4
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRerollMagicShard": {
+      "name": "Alteration Shard",
+      "fee": [
+        1,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyUpgradeToRareShard": {
+      "name": "Alchemy Shard",
+      "fee": [
+        1,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyImprintOrb": {
+      "name": "Eternal Orb",
+      "fee": [
+        6250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyCorrupt": {
+      "name": "Vaal Orb",
+      "fee": [
+        20,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencySilverCoin": {
+      "name": "Silver Coin",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAddModToRareShaper": {
+      "name": "Shaper's Exalted Orb",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAddModToRareElder": {
+      "name": "Elder's Exalted Orb",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAddZanaInfluence": {
+      "name": "Orb of Remembrance",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRemoveZanaInfluence": {
+      "name": "Orb of Unravelling",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyMoreZanaInfluencedItems": {
+      "name": "Orb of Intention",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHeistWeaponEnchant": {
+      "name": "Tempering Orb",
+      "fee": [
+        250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHeistArmourEnchant": {
+      "name": "Tailoring Orb",
+      "fee": [
+        250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbCurrency": {
+      "name": "Fine Delirium Orb",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbUniques": {
+      "name": "Singular Delirium Orb",
+      "fee": [
+        175,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbGems": {
+      "name": "Thaumaturge's Delirium Orb",
+      "fee": [
+        225,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbWeapons": {
+      "name": "Blacksmith's Delirium Orb",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbArmour": {
+      "name": "Armoursmith's Delirium Orb",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbMaps": {
+      "name": "Cartographer's Delirium Orb",
+      "fee": [
+        175,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbTrinkets": {
+      "name": "Jeweller's Delirium Orb",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbAbyss": {
+      "name": "Abyssal Delirium Orb",
+      "fee": [
+        225,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbPerandus": {
+      "name": "Kalguuran Delirium Orb",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbHarbinger": {
+      "name": "Fine Delirium Orb",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbBreach": {
+      "name": "Obscured Delirium Orb",
+      "fee": [
+        225,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbEssences": {
+      "name": "Whispering Delirium Orb",
+      "fee": [
+        175,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbFragments": {
+      "name": "Fragmented Delirium Orb",
+      "fee": [
+        225,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbScarabs": {
+      "name": "Skittering Delirium Orb",
+      "fee": [
+        250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbFossils": {
+      "name": "Fossilised Delirium Orb",
+      "fee": [
+        225,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbProphecies": {
+      "name": "Fine Delirium Orb",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbDivinationCards": {
+      "name": "Diviner's Delirium Orb",
+      "fee": [
+        150,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbGeneric": {
+      "name": "Delirium Orb",
+      "fee": [
+        250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbTalismans": {
+      "name": "Primal Delirium Orb",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbLabyrinth": {
+      "name": "Imperial Delirium Orb",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbIncubators": {
+      "name": "Timeless Delirium Orb",
+      "fee": [
+        225,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbBlight": {
+      "name": "Blighted Delirium Orb",
+      "fee": [
+        225,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbMetamorphosis": {
+      "name": "Challenging Delirium Orb",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionOrbHardMode": {
+      "name": "Delirium Orb",
+      "fee": [
+        250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionRerollClusterEnchant": {
+      "name": "Refracting Fog",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyMutatedAddModToMagic": {
+      "name": "Foulborn Orb of Augmentation",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyMutatedUpgradeMagicToRare": {
+      "name": "Foulborn Regal Orb",
+      "fee": [
+        750,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyMutatedAddModToRare": {
+      "name": "Foulborn Exalted Orb",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceHatred1": {
+      "name": "Whispering Essence of Hatred",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceHatred2": {
+      "name": "Muttering Essence of Hatred",
+      "fee": [
+        35,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceHatred3": {
+      "name": "Weeping Essence of Hatred",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceHatred4": {
+      "name": "Wailing Essence of Hatred",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceHatred5": {
+      "name": "Screaming Essence of Hatred",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceHatred6": {
+      "name": "Shrieking Essence of Hatred",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceHatred7": {
+      "name": "Deafening Essence of Hatred",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceWoe1": {
+      "name": "Whispering Essence of Woe",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceWoe2": {
+      "name": "Muttering Essence of Woe",
+      "fee": [
+        35,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceWoe3": {
+      "name": "Weeping Essence of Woe",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceWoe4": {
+      "name": "Wailing Essence of Woe",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceWoe5": {
+      "name": "Screaming Essence of Woe",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceWoe6": {
+      "name": "Shrieking Essence of Woe",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceWoe7": {
+      "name": "Deafening Essence of Woe",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceGreed1": {
+      "name": "Whispering Essence of Greed",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceGreed2": {
+      "name": "Muttering Essence of Greed",
+      "fee": [
+        35,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceGreed3": {
+      "name": "Weeping Essence of Greed",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceGreed4": {
+      "name": "Wailing Essence of Greed",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceGreed5": {
+      "name": "Screaming Essence of Greed",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceGreed6": {
+      "name": "Shrieking Essence of Greed",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceGreed7": {
+      "name": "Deafening Essence of Greed",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceContempt1": {
+      "name": "Whispering Essence of Contempt",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceContempt2": {
+      "name": "Muttering Essence of Contempt",
+      "fee": [
+        35,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceContempt3": {
+      "name": "Weeping Essence of Contempt",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceContempt4": {
+      "name": "Wailing Essence of Contempt",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceContempt5": {
+      "name": "Screaming Essence of Contempt",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceContempt6": {
+      "name": "Shrieking Essence of Contempt",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceContempt7": {
+      "name": "Deafening Essence of Contempt",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSorrow1": {
+      "name": "Muttering Essence of Sorrow",
+      "fee": [
+        35,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSorrow2": {
+      "name": "Weeping Essence of Sorrow",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSorrow3": {
+      "name": "Wailing Essence of Sorrow",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSorrow4": {
+      "name": "Screaming Essence of Sorrow",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSorrow5": {
+      "name": "Shrieking Essence of Sorrow",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSorrow6": {
+      "name": "Deafening Essence of Sorrow",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceAnger1": {
+      "name": "Muttering Essence of Anger",
+      "fee": [
+        35,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceAnger2": {
+      "name": "Weeping Essence of Anger",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceAnger3": {
+      "name": "Wailing Essence of Anger",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceAnger4": {
+      "name": "Screaming Essence of Anger",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceAnger5": {
+      "name": "Shrieking Essence of Anger",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceAnger6": {
+      "name": "Deafening Essence of Anger",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceTorment1": {
+      "name": "Muttering Essence of Torment",
+      "fee": [
+        35,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceTorment2": {
+      "name": "Weeping Essence of Torment",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceTorment3": {
+      "name": "Wailing Essence of Torment",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceTorment4": {
+      "name": "Screaming Essence of Torment",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceTorment5": {
+      "name": "Shrieking Essence of Torment",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceTorment6": {
+      "name": "Deafening Essence of Torment",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceFear1": {
+      "name": "Muttering Essence of Fear",
+      "fee": [
+        35,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceFear2": {
+      "name": "Weeping Essence of Fear",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceFear3": {
+      "name": "Wailing Essence of Fear",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceFear4": {
+      "name": "Screaming Essence of Fear",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceFear5": {
+      "name": "Shrieking Essence of Fear",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceFear6": {
+      "name": "Deafening Essence of Fear",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSuffering1": {
+      "name": "Weeping Essence of Suffering",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSuffering2": {
+      "name": "Wailing Essence of Suffering",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSuffering3": {
+      "name": "Screaming Essence of Suffering",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSuffering4": {
+      "name": "Shrieking Essence of Suffering",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSuffering5": {
+      "name": "Deafening Essence of Suffering",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceRage1": {
+      "name": "Weeping Essence of Rage",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceRage2": {
+      "name": "Wailing Essence of Rage",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceRage3": {
+      "name": "Screaming Essence of Rage",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceRage4": {
+      "name": "Shrieking Essence of Rage",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceRage5": {
+      "name": "Deafening Essence of Rage",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceWrath1": {
+      "name": "Weeping Essence of Wrath",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceWrath2": {
+      "name": "Wailing Essence of Wrath",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceWrath3": {
+      "name": "Screaming Essence of Wrath",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceWrath4": {
+      "name": "Shrieking Essence of Wrath",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceWrath5": {
+      "name": "Deafening Essence of Wrath",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceDoubt1": {
+      "name": "Weeping Essence of Doubt",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceDoubt2": {
+      "name": "Wailing Essence of Doubt",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceDoubt3": {
+      "name": "Screaming Essence of Doubt",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceDoubt4": {
+      "name": "Shrieking Essence of Doubt",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceDoubt5": {
+      "name": "Deafening Essence of Doubt",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceAnguish1": {
+      "name": "Wailing Essence of Anguish",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceAnguish2": {
+      "name": "Screaming Essence of Anguish",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceAnguish3": {
+      "name": "Shrieking Essence of Anguish",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceAnguish4": {
+      "name": "Deafening Essence of Anguish",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceLoathing1": {
+      "name": "Wailing Essence of Loathing",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceLoathing2": {
+      "name": "Screaming Essence of Loathing",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceLoathing3": {
+      "name": "Shrieking Essence of Loathing",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceLoathing4": {
+      "name": "Deafening Essence of Loathing",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSpite1": {
+      "name": "Wailing Essence of Spite",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSpite2": {
+      "name": "Screaming Essence of Spite",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSpite3": {
+      "name": "Shrieking Essence of Spite",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceSpite4": {
+      "name": "Deafening Essence of Spite",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceZeal1": {
+      "name": "Wailing Essence of Zeal",
+      "fee": [
+        55,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceZeal2": {
+      "name": "Screaming Essence of Zeal",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceZeal3": {
+      "name": "Shrieking Essence of Zeal",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceZeal4": {
+      "name": "Deafening Essence of Zeal",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceMisery1": {
+      "name": "Screaming Essence of Misery",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceMisery2": {
+      "name": "Shrieking Essence of Misery",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceMisery3": {
+      "name": "Deafening Essence of Misery",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceDread1": {
+      "name": "Screaming Essence of Dread",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceDread2": {
+      "name": "Shrieking Essence of Dread",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceDread3": {
+      "name": "Deafening Essence of Dread",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceScorn1": {
+      "name": "Screaming Essence of Scorn",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceScorn2": {
+      "name": "Shrieking Essence of Scorn",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceScorn3": {
+      "name": "Deafening Essence of Scorn",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceEnvy1": {
+      "name": "Screaming Essence of Envy",
+      "fee": [
+        65,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceEnvy2": {
+      "name": "Shrieking Essence of Envy",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceEnvy3": {
+      "name": "Deafening Essence of Envy",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceHysteria1": {
+      "name": "Essence of Hysteria",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceInsanity1": {
+      "name": "Essence of Insanity",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceHorror1": {
+      "name": "Essence of Horror",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceDelirium1": {
+      "name": "Essence of Delirium",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEssenceFaridun1": {
+      "name": "Essence of Desolation",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyBreachUpgradeUniqueGeneral": {
+      "name": "Flesh of Xesht",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyLegionKaruiShard": {
+      "name": "Timeless Karui Splinter",
+      "fee": [
+        5,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyLegionMarakethShard": {
+      "name": "Timeless Maraketh Splinter",
+      "fee": [
+        8,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyLegionEternalEmpireShard": {
+      "name": "Timeless Eternal Empire Splinter",
+      "fee": [
+        5,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyLegionTemplarShard": {
+      "name": "Timeless Templar Splinter",
+      "fee": [
+        8,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyLegionVaalShard": {
+      "name": "Timeless Vaal Splinter",
+      "fee": [
+        5,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAfflictionShard": {
+      "name": "Simulacrum Splinter",
+      "fee": [
+        1,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRemoveMod": {
+      "name": "Orb of Annulment",
+      "fee": [
+        250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyUpgradeToRareAndSetSockets": {
+      "name": "Orb of Binding",
+      "fee": [
+        20,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRerollUnique": {
+      "name": "Ancient Orb",
+      "fee": [
+        250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyFractureRare": {
+      "name": "Fracturing Orb",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRemoveModShard": {
+      "name": "Annulment Shard",
+      "fee": [
+        6,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRerollRareShard": {
+      "name": "Chaos Shard",
+      "fee": [
+        1,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDuplicateShard": {
+      "name": "Mirror Shard",
+      "fee": [
+        1250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAddModToRareShard": {
+      "name": "Exalted Shard",
+      "fee": [
+        2,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRareShard": {
+      "name": "Regal Shard",
+      "fee": [
+        2,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyFractureRareShard": {
+      "name": "Fracturing Shard",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingFire": {
+      "name": "Scorched Fossil",
+      "fee": [
+        30,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingCold": {
+      "name": "Frigid Fossil",
+      "fee": [
+        30,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingLightning": {
+      "name": "Metallic Fossil",
+      "fee": [
+        30,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingPhysical": {
+      "name": "Jagged Fossil",
+      "fee": [
+        30,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingChaos": {
+      "name": "Aberrant Fossil",
+      "fee": [
+        30,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingLife": {
+      "name": "Pristine Fossil",
+      "fee": [
+        30,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingDefences": {
+      "name": "Dense Fossil",
+      "fee": [
+        30,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingBleedPoison": {
+      "name": "Corroded Fossil",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingElemental": {
+      "name": "Prismatic Fossil",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingCasterMods": {
+      "name": "Aetheric Fossil",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingAttackMods": {
+      "name": "Serrated Fossil",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingMana": {
+      "name": "Lucent Fossil",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingSpeed": {
+      "name": "Shuddering Fossil",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingMinionsAuras": {
+      "name": "Bound Fossil",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingQuality": {
+      "name": "Opulent Fossil",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingEnchant": {
+      "name": "Deft Fossil",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingSockets": {
+      "name": "Fundamental Fossil",
+      "fee": [
+        45,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingGemLevel": {
+      "name": "Faceted Fossil",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingVaal": {
+      "name": "Bloodstained Fossil",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingAbyss": {
+      "name": "Hollow Fossil",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingMirror": {
+      "name": "Fractured Fossil",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingCorruptEssence": {
+      "name": "Glyphic Fossil",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingRandom": {
+      "name": "Tangled Fossil",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingLuckyModRolls": {
+      "name": "Sanctified Fossil",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDelveCraftingSellPrice": {
+      "name": "Gilded Fossil",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualityElemental": {
+      "name": "Turbulent Catalyst",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualityCaster": {
+      "name": "Imbued Catalyst",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttack": {
+      "name": "Abrasive Catalyst",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualityDefense": {
+      "name": "Tempering Catalyst",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualityResource": {
+      "name": "Fertile Catalyst",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualityResistance": {
+      "name": "Prismatic Catalyst",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttribute": {
+      "name": "Intrinsic Catalyst",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualityPhysicalChaos": {
+      "name": "Noxious Catalyst",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualitySpeed": {
+      "name": "Accelerating Catalyst",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualityCritical": {
+      "name": "Unstable Catalyst",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualityVaal": {
+      "name": "Tainted Catalyst",
+      "fee": [
+        150,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualityPrefix": {
+      "name": "Sinistral Catalyst",
+      "fee": [
+        150,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyJewelleryQualitySuffix": {
+      "name": "Dextral Catalyst",
+      "fee": [
+        150,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRitualSplinter": {
+      "name": "Ritual Splinter",
+      "fee": [
+        2,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRitualStone": {
+      "name": "Ritual Vessel",
+      "fee": [
+        250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEldritchEmber1": {
+      "name": "Lesser Eldritch Ember",
+      "fee": [
+        35,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEldritchEmber2": {
+      "name": "Greater Eldritch Ember",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEldritchEmber3": {
+      "name": "Grand Eldritch Ember",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEldritchEmber4": {
+      "name": "Exceptional Eldritch Ember",
+      "fee": [
+        200,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEldritchIchor1": {
+      "name": "Lesser Eldritch Ichor",
+      "fee": [
+        35,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEldritchIchor2": {
+      "name": "Greater Eldritch Ichor",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEldritchIchor3": {
+      "name": "Grand Eldritch Ichor",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEldritchIchor4": {
+      "name": "Exceptional Eldritch Ichor",
+      "fee": [
+        200,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyConflictOrb": {
+      "name": "Orb of Conflict",
+      "fee": [
+        1050,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyValdoPuzzleBox": {
+      "name": "Valdo's Puzzle Box",
+      "fee": [
+        300,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/MushruneCorrupt": {
+      "name": "Tainted Oil",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/MushruneMirror": {
+      "name": "Reflective Oil",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/MushruneUber": {
+      "name": "Prismatic Oil",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune1": {
+      "name": "Clear Oil",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune2": {
+      "name": "Sepia Oil",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune3": {
+      "name": "Amber Oil",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune4": {
+      "name": "Verdant Oil",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune5": {
+      "name": "Teal Oil",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune6": {
+      "name": "Azure Oil",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune6b": {
+      "name": "Indigo Oil",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune7": {
+      "name": "Violet Oil",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune8": {
+      "name": "Crimson Oil",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune9": {
+      "name": "Black Oil",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune10": {
+      "name": "Opalescent Oil",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune11": {
+      "name": "Silver Oil",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/Mushrune12": {
+      "name": "Golden Oil",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyUpgradeInfluenceMod": {
+      "name": "Orb of Dominance",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEnkindlingOrb": {
+      "name": "Enkindling Orb",
+      "fee": [
+        35,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyInstillingOrb": {
+      "name": "Instilling Orb",
+      "fee": [
+        20,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRefreshBarter": {
+      "name": "Exotic Coinage",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRefreshDealer": {
+      "name": "Scrap Metal",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRefreshGambler": {
+      "name": "Astragali",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyRefreshSaga": {
+      "name": "Burial Medallion",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHellscapeRerollSocketColours": {
+      "name": "Tainted Chromatic Orb",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHellscapeRerollSocketLinks": {
+      "name": "Tainted Orb of Fusing",
+      "fee": [
+        150,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHellscapeRerollSocketNumbers": {
+      "name": "Tainted Jeweller's Orb",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHellscapeRerollRare": {
+      "name": "Tainted Chaos Orb",
+      "fee": [
+        375,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHellscapeAddModToRare": {
+      "name": "Tainted Exalted Orb",
+      "fee": [
+        575,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHellscapeUpgradeToUnique": {
+      "name": "Tainted Mythic Orb",
+      "fee": [
+        200,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHellscapeArmourQuality": {
+      "name": "Tainted Armourer's Scrap",
+      "fee": [
+        75,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHellscapeWeaponQuality": {
+      "name": "Tainted Blacksmith's Whetstone",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHellscapeUpgradeModTier": {
+      "name": "Tainted Divine Teardrop",
+      "fee": [
+        900,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHellscapeModValues": {
+      "name": "Volatile Vaal Orb",
+      "fee": [
+        900,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEldritchRerollRare": {
+      "name": "Eldritch Chaos Orb",
+      "fee": [
+        525,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEldritchAddModToRare": {
+      "name": "Eldritch Exalted Orb",
+      "fee": [
+        525,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyEldritchRemoveMod": {
+      "name": "Eldritch Orb of Annulment",
+      "fee": [
+        525,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/FearMemoryThread": {
+      "name": "Memory of Trauma",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/BenevolenceMemoryThread": {
+      "name": "Memory of Reverence",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/IgnoranceMemoryThread": {
+      "name": "Memory of Loneliness",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/HarvestSeedRed": {
+      "name": "Wild Crystallised Lifeforce",
+      "fee": [
+        1,
+        8
+      ]
+    },
+    "Metadata/Items/Currency/HarvestSeedGreen": {
+      "name": "Vivid Crystallised Lifeforce",
+      "fee": [
+        1,
+        8
+      ]
+    },
+    "Metadata/Items/Currency/HarvestSeedBlue": {
+      "name": "Primal Crystallised Lifeforce",
+      "fee": [
+        1,
+        8
+      ]
+    },
+    "Metadata/Items/Currency/HarvestSeedBoss": {
+      "name": "Sacred Crystallised Lifeforce",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/HarvestSeedFaridun": {
+      "name": "Crystallised Rancour",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyAncestralSilverCoin": {
+      "name": "Silver Coin",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyHinekorasLock": {
+      "name": "Hinekora's Lock",
+      "fee": [
+        6250,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralOmenOnDeathPreventExpLoss": {
+      "name": "Omen of Amelioration",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralOmenOnDeathCreatePortal": {
+      "name": "Omen of Return",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralOmenOnCriticalLifeAvoidDamage": {
+      "name": "Omen of Death-dancing",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralOmenOnCriticalLifeRecoverFlaskCharges": {
+      "name": "Omen of Refreshment",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralOmenOnLevelingUpGainSoulEater": {
+      "name": "Omen of the Soul Devourer",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralOmenOnChanceMakeUnique": {
+      "name": "Omen of Fortune",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralOmenOnJewellersMakeFullSockets": {
+      "name": "Omen of the Jeweller",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralOmenOnFusingMakeFullLinks": {
+      "name": "Omen of Connections",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralOmenOnChromaticAddWhiteSockets": {
+      "name": "Omen of Trichromatism",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralOmenOnCriticalLifeGainAdrenaline": {
+      "name": "Omen of Adrenaline",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralOmenOnCriticalLifeGainShadeForm": {
+      "name": "Omen of Death's Door",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralOmenOnLevelingUpGainExperienceBuff": {
+      "name": "Omen of Brilliance",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooNgamahu1": {
+      "name": "Tattoo of the Ngamahu Firewalker",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooNgamahu2": {
+      "name": "Tattoo of the Ngamahu Shaman",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooNgamahu3": {
+      "name": "Tattoo of the Ngamahu Warrior",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooNgamahu4": {
+      "name": "Tattoo of the Ngamahu Warmonger",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooNgamahu5": {
+      "name": "Tattoo of the Ngamahu Woodcarver",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooNgamahu6": {
+      "name": "Loyalty Tattoo of Kaom",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooNgamahu7": {
+      "name": "Tattoo of the Ngamahu Makanga",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooKitava1": {
+      "name": "Tattoo of the Kitava Blood Drinker",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooKitava2": {
+      "name": "Tattoo of the Kitava Rebel",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooKitava3": {
+      "name": "Tattoo of the Kitava Warrior",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooKitava4": {
+      "name": "Tattoo of the Kitava Heart Eater",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooKitava5": {
+      "name": "Tattoo of the Kitava Shaman",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooKitava6": {
+      "name": "Loyalty Tattoo of Utula",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooKitava7": {
+      "name": "Tattoo of the Kitava Makanga",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTukohama1": {
+      "name": "Tattoo of the Tukohama Shaman",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTukohama2": {
+      "name": "Tattoo of the Tukohama Warrior",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTukohama3": {
+      "name": "Tattoo of the Tukohama Brawler",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTukohama4": {
+      "name": "Tattoo of the Tukohama Warmonger",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTukohama5": {
+      "name": "Tattoo of the Tukohama Warcaller",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTukohama6": {
+      "name": "Loyalty Tattoo of Akoya",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTukohama7": {
+      "name": "Tattoo of the Tukohama Makanga",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRongokurai1": {
+      "name": "Tattoo of the Rongokurai Warrior",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRongokurai2": {
+      "name": "Tattoo of the Rongokurai Brute",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRongokurai3": {
+      "name": "Tattoo of the Rongokurai Goliath",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRongokurai4": {
+      "name": "Tattoo of the Rongokurai Turtle",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRongokurai5": {
+      "name": "Tattoo of the Rongokurai Guard",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRongokurai6": {
+      "name": "Loyalty Tattoo of Kahuturoa",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRongokurai7": {
+      "name": "Tattoo of the Rongokurai Makanga",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTasalio1": {
+      "name": "Tattoo of the Tasalio Bladedancer",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTasalio2": {
+      "name": "Tattoo of the Tasalio Tideshifter",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTasalio3": {
+      "name": "Tattoo of the Tasalio Shaman",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTasalio4": {
+      "name": "Tattoo of the Tasalio Warrior",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTasalio5": {
+      "name": "Tattoo of the Tasalio Scout",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTasalio6": {
+      "name": "Loyalty Tattoo of Rakiata",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTasalio7": {
+      "name": "Tattoo of the Tasalio Makanga",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooArohongui1": {
+      "name": "Tattoo of the Arohongui Moonwarden",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooArohongui2": {
+      "name": "Tattoo of the Arohongui Scout",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooArohongui3": {
+      "name": "Tattoo of the Arohongui Warrior",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooArohongui4": {
+      "name": "Tattoo of the Arohongui Warmonger",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooArohongui5": {
+      "name": "Tattoo of the Arohongui Shaman",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooArohongui6": {
+      "name": "Loyalty Tattoo of Ikiaho",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooArohongui7": {
+      "name": "Tattoo of the Arohongui Makanga",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRamako1": {
+      "name": "Tattoo of the Ramako Scout",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRamako2": {
+      "name": "Tattoo of the Ramako Archer",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRamako3": {
+      "name": "Tattoo of the Ramako Sniper",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRamako4": {
+      "name": "Tattoo of the Ramako Fleetfoot",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRamako5": {
+      "name": "Tattoo of the Ramako Shaman",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRamako6": {
+      "name": "Loyalty Tattoo of Ahuana",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooRamako7": {
+      "name": "Tattoo of the Ramako Makanga",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooHinekora1": {
+      "name": "Tattoo of the Hinekora Warrior",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooHinekora2": {
+      "name": "Tattoo of the Hinekora Deathwarden",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooHinekora3": {
+      "name": "Tattoo of the Hinekora Shaman",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooHinekora4": {
+      "name": "Tattoo of the Hinekora Storyteller",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooHinekora5": {
+      "name": "Tattoo of the Hinekora Warmonger",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooHinekora6": {
+      "name": "Loyalty Tattoo of Tawhanuku",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooHinekora7": {
+      "name": "Tattoo of the Hinekora Makanga",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTawhoa1": {
+      "name": "Tattoo of the Tawhoa Naturalist",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTawhoa2": {
+      "name": "Tattoo of the Tawhoa Scout",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTawhoa3": {
+      "name": "Tattoo of the Tawhoa Warrior",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTawhoa4": {
+      "name": "Tattoo of the Tawhoa Herbalist",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTawhoa5": {
+      "name": "Tattoo of the Tawhoa Shaman",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTawhoa6": {
+      "name": "Loyalty Tattoo of Maata",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooTawhoa7": {
+      "name": "Tattoo of the Tawhoa Makanga",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooValako1": {
+      "name": "Tattoo of the Valako Stormrider",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooValako2": {
+      "name": "Tattoo of the Valako Scout",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooValako3": {
+      "name": "Tattoo of the Valako Warrior",
+      "fee": [
+        25,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooValako4": {
+      "name": "Tattoo of the Valako Shieldbearer",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooValako5": {
+      "name": "Tattoo of the Valako Shaman",
+      "fee": [
+        50,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooValako6": {
+      "name": "Loyalty Tattoo of Kiloava",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooValako7": {
+      "name": "Tattoo of the Valako Makanga",
+      "fee": [
+        100,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialSmallNode1": {
+      "name": "Honoured Tattoo of the Dove",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialSmallNode2": {
+      "name": "Honoured Tattoo of the Sky",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialSmallNode3": {
+      "name": "Honoured Tattoo of the Tuatara",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialSmallNode4": {
+      "name": "Honoured Tattoo of the Pillager",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialSmallNode5": {
+      "name": "Honoured Tattoo of the Turtle",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialSmallNode6": {
+      "name": "Honoured Tattoo of the Oak",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialSmallNode7": {
+      "name": "Honoured Tattoo of the Hatungo",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialSmallNode8": {
+      "name": "Honoured Tattoo of the Flock",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialNotableStr1": {
+      "name": "Honoured Tattoo of the Warlord",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialNotableStr2": {
+      "name": "Honoured Tattoo of the Mountain",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialNotableStr3": {
+      "name": "Honoured Tattoo of the Pa",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialNotableDex1": {
+      "name": "Honoured Tattoo of the Hunter",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialNotableDex2": {
+      "name": "Honoured Tattoo of the Barbarian",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialNotableDex3": {
+      "name": "Honoured Tattoo of the Berserker",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialNotableInt1": {
+      "name": "Honoured Tattoo of the Wise",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialNotableInt2": {
+      "name": "Honoured Tattoo of the Storm",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialNotableInt3": {
+      "name": "Honoured Tattoo of the Flood",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique1": {
+      "name": "Ancestral Tattoo of Bloodlines",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique2": {
+      "name": "Honoured Tattoo of the Makanga",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique3": {
+      "name": "Journey Tattoo of the Body",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique4": {
+      "name": "Journey Tattoo of the Mind",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique5": {
+      "name": "Journey Tattoo of the Soul",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique6": {
+      "name": "Journey Tattoo of Makanui",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique7Ranger": {
+      "name": "Forbidden Tattoo of the Ranger",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique7Duelist": {
+      "name": "Forbidden Tattoo of the Duelist",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique7Marauder": {
+      "name": "Forbidden Tattoo of the Marauder",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique7Templar": {
+      "name": "Forbidden Tattoo of the Templar",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique7Witch": {
+      "name": "Forbidden Tattoo of the Witch",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique7Shadow": {
+      "name": "Forbidden Tattoo of the Shadow",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AncestralTattooSpecialUnique7Scion": {
+      "name": "Forbidden Tattoo of the Scion",
+      "fee": [
+        125,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/ReflectiveMist": {
+      "name": "Reflecting Mist",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftLowLifeRestore": {
+      "name": "Runegraft of the River",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftAttributeGlobalDefences": {
+      "name": "Runegraft of the Fortress",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftMatchedAttackDamage": {
+      "name": "Runegraft of the Combatant",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftFlatOffhandAttackTime": {
+      "name": "Runegraft of the Sinistral",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftBootsGloves": {
+      "name": "Runegraft of the Bound",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftBuffScaling": {
+      "name": "Runegraft of the Warp",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftSouls": {
+      "name": "Runegraft of the Soulwick",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftWarcrySpeed": {
+      "name": "Runegraft of Bellows",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftSupportLevels": {
+      "name": "Runegraft of Gemcraft",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftRandomCurse": {
+      "name": "Runegraft of Blasphemy",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftCooldownRefresh": {
+      "name": "Runegraft of Time",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftTreacherousAuras": {
+      "name": "Runegraft of Treachery",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftLifeFromManaFlasks": {
+      "name": "Runegraft of Quaffing",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftCritRecoup": {
+      "name": "Runegraft of Restitching",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftAilmentRedirect": {
+      "name": "Runegraft of Loyalty",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftSpellLifeCost": {
+      "name": "Runegraft of the Witchmark",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftNovaMarkedTarget": {
+      "name": "Runegraft of the Novamark",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftChainMana": {
+      "name": "Runegraft of Refraction",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftDamagePerSocket": {
+      "name": "Runegraft of the Jeweller",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftUnexciting": {
+      "name": "Runegraft of Stability",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftFishing": {
+      "name": "Runegraft of the Angler",
+      "fee": [
+        5000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftConsecratedGround": {
+      "name": "Runegraft of Consecration",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftLifeFlaskRage": {
+      "name": "Runegraft of Fury",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftFortificationBanner": {
+      "name": "Runegraft of Rallying",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftPoisonConversion": {
+      "name": "Runegraft of Rotblood",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftTinctures": {
+      "name": "Runegraft of the Imbued",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftElusive": {
+      "name": "Runegraft of the Agile",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftSuffering": {
+      "name": "Runegraft of Suffering",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftSpellbound": {
+      "name": "Runegraft of the Spellbound",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftResurgence": {
+      "name": "Runegraft of Resurgence",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/RunegraftConnection": {
+      "name": "Runegraft of Connection",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyWishConvertUnique": {
+      "name": "Coin of Restoration",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyWishConvertUniqueCorrupt": {
+      "name": "Coin of Desecration",
+      "fee": [
+        500,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyWishSupportGemBlue": {
+      "name": "Coin of Knowledge",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyWishSupportGemRed": {
+      "name": "Coin of Power",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyWishSupportGemGreen": {
+      "name": "Coin of Skill",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AstrolabeGeneric": {
+      "name": "Templar Astrolabe",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AstrolabeHarvest": {
+      "name": "Fruiting Astrolabe",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AstrolabeAbyss": {
+      "name": "Lightless Astrolabe",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AstrolabeBreach": {
+      "name": "Grasping Astrolabe",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AstrolabeRitual": {
+      "name": "Nameless Astrolabe",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AstrolabeBlight": {
+      "name": "Fungal Astrolabe",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AstrolabeUltimatum": {
+      "name": "Chaotic Astrolabe",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AstrolabeDelirium": {
+      "name": "Deceptive Astrolabe",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AstrolabeLegion": {
+      "name": "Timeless Astrolabe",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/AstrolabeExpedition": {
+      "name": "Runic Astrolabe",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/LegionCocoonGloves": {
+      "name": "Karui Enshrouding Crystal",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/LegionCocoonBoots": {
+      "name": "Imperial Enshrouding Crystal",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/LegionCocoonHelmet": {
+      "name": "Vaal Enshrouding Crystal",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/LegionCocoonShield": {
+      "name": "Templar Enshrouding Crystal",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/LegionCocoonBodyArmour": {
+      "name": "Maraketh Enshrouding Crystal",
+      "fee": [
+        1000,
+        1
+      ]
+    },
+    "Metadata/Items/Currency/CurrencyDeepwater": {
+      "name": "Dead Man's Sulphur",
+      "fee": [
+        1,
+        1000
+      ]
+    }
+  }
+}

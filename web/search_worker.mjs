@@ -1,4 +1,4 @@
-import {search_cycles} from './core.mjs?v=stock-filter-v1';
+import {search_cycles} from './core.mjs?v=gold-fees-v1';
 
 self.onmessage = ({data}) => {
   try {

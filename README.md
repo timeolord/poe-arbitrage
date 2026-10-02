@@ -8,7 +8,7 @@ Live at [www.melkyway.ca/poe-arbitrage](https://www.melkyway.ca/poe-arbitrage/).
 
 The scanner treats currencies as a directed graph, with exchange rates calculated from traded volumes. The dashboard searches market and vendor cycles from two trades up to the user’s maximum (2–8), including the return trade. Each currency appears once before returning to the starting currency, and leagues remain separate.
 
-The dashboard simulates each cycle using a whole-unit starting balance. It shows the ending balance, profit percentage, historical rate range, and details for each trade. Filters select the league, starting currency, minimum profit, minimum traded volume, and maximum trades. An optional haircut reduces the estimated return on each market trade to model slippage. Fixed vendor trades use exact whole batches without a haircut.
+The dashboard simulates each cycle using a whole-unit starting balance. It shows the ending balance, profit percentage, historical rate range, estimated gold fees, gold per unit of profit, and details for each trade. Filters select the league, starting currency, minimum profit, minimum traded volume, maximum trades, and an optional gold budget. Cycles can be sorted by profit percentage or profit per 100,000 gold. An optional haircut reduces the estimated return on each market trade to model slippage. Fixed vendor trades use exact whole batches without a haircut.
 
 Only quoted currency items enter the cycle graph. Currency recipes have a separate calculator that values every input and reward against direct historical Chaos market quotes. The catalogue contains only deterministic currency exchanges.
 
@@ -82,9 +82,19 @@ Pairs with zero volume, invalid ratios, or a central rate outside the reported r
 
 A vendor leg returns `floor(amount / input_batch) * output_batch`. Unspent inputs are displayed but excluded from the ending balance. The catalogue uses documented 3.29 non-Ruthless rules against the historical snapshot; it does not reconstruct vendor rules from the snapshot's patch date. Vendor scanning and recipe estimates are disabled for Ruthless leagues.
 
-The recipe calculator buys each currency ingredient with Chaos Orbs using a direct quote, rounding the required Chaos up. It then sells every currency reward back to Chaos and rounds down. Profit percentage is `100 * (return / total_cost - 1)`. Missing quotes suppress estimates, and a zero cost has no defined percentage. Available orders, travel time and gold are not supplied by GGG's hourly feed.
+The recipe calculator buys each currency ingredient with Chaos Orbs using a direct quote, rounding the required Chaos up. It then sells every currency reward back to Chaos and rounds down. Profit percentage is `100 * (return / total_cost - 1)`. Missing quotes suppress estimates, and a zero cost has no defined percentage. Gold estimates include purchases of currency ingredients and sales of currency rewards. Direct Chaos inputs and outputs need no additional market order. Available orders, travel time and gold fees are not supplied by GGG's hourly feed; fees come from the separate table described below.
 
 The catalogue contains 16 fixed exchanges and two currency baskets: Fusing plus Chromatic to Jeweller, and the Mirror sale with multiple currency rewards. Equipment, gem, flask, quest-item and map recipes, random exchanges, retired recipes and unused references are excluded. Quoted adjacent essence upgrades remain in the scanner. Each catalogue entry links its rate reference and the 3.29 patch notes. The review checks documented rates against patch changes; it is not an in-game verification. [GGG removed Jeweller’s-to-Chromatic purchases in 3.29](https://www.pathofexile.com/forum/view-thread/3985332), so that exchange is excluded.
+
+## Gold costs
+
+`web/gold_fees.json` contains receiving item fees from [PoEDB's Currency Exchange table](https://poedb.tw/us/Currency_Exchange), matched to full GGG item IDs using [RePoE's game data export](https://repoe-fork.github.io/base_items.json). The table records its patch, review date and source URLs. It uses 3.29 fees against the selected historical prices; it does not reconstruct past patch fees. The browser and worker use this table; the Rust command line continues to report currency returns.
+
+Each market leg costs `ceil(received_quantity * fee_numerator / fee_denominator)` gold. Quantities are the simulated whole item outputs after haircut and rounding. Vendor legs cost no exchange gold. Fractions use exact integer arithmetic and conservative upward rounding per leg, which has not been verified in game. The estimate assumes one listing per market leg without cancellations, partial fill refunds or reposting. Check the displayed gold fee in game before placing an order.
+
+Total gold is the sum of all market fees, including the closing trade. Gold per currency earned is `total_gold / (ending_balance - starting_balance)`. Profit per 100,000 gold is `(ending_balance - starting_balance) * 100000 / total_gold`. Efficiency requires positive profit, and the second ratio requires positive gold. Gold remains a separate expense and is not subtracted from the currency balance. Recipe estimates use the same calculation for buying ingredients and selling rewards.
+
+Unknown item fees leave the total and efficiency unavailable. Entering a gold budget excludes cycles with unknown fees or totals above the budget; leaving the field blank removes that constraint. Unknown or undefined efficiencies sort after defined efficiencies, with profit percentage breaking ties. Best and median returns are calculated independently of the selected sort order. Update the fee table when game patches change fees, retaining the full item IDs and rational fee pairs.
 
 ## Data
 
@@ -98,6 +108,6 @@ python3 scripts/fetch_snapshot.py --realm pc --hour 1790899200 --output data/sna
 
 The hour must be a Unix timestamp on an hourly boundary. Older snapshots may eventually become unavailable.
 
-These are historical aggregates, so the rates and range endpoints may come from trades at different times. The range is not a confidence interval or a set of simultaneous quotes. Order lot sizes and executable liquidity are not available; the calculator assumes whole-unit fills, excludes intermediate leftovers and gold costs, and displays hourly stock only as context. Check current in-game rates before trading.
+These are historical aggregates, so the rates and range endpoints may come from trades at different times. The range is not a confidence interval or a set of simultaneous quotes. Order lot sizes and executable liquidity are not available; the calculator assumes whole-unit fills, excludes intermediate leftovers, accounts for gold separately, and displays hourly stock only as context. Check current in-game rates before trading.
 
 This product isn't affiliated with or endorsed by Grinding Gear Games in any way.
