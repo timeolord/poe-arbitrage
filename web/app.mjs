@@ -1,4 +1,4 @@
-import {currency_name, search_cycles, quote_recipe} from './core.mjs?v=audit329-v1';
+import {currency_name, search_cycles, quote_recipe} from './core.mjs?v=stock-filter-v1';
 
 const by_id = id => document.getElementById(id);
 const format_number = value => new Intl.NumberFormat(undefined, {maximumFractionDigits: 2}).format(value);
@@ -106,7 +106,7 @@ function render() {
       finish_render(league, search_cycles(league, options));
       return;
     }
-    const worker = new Worker('./search_worker.mjs?v=audit329-v1', {type: 'module'});
+    const worker = new Worker('./search_worker.mjs?v=stock-filter-v1', {type: 'module'});
     search_worker = worker;
     worker.onmessage = ({data}) => {
       if (search_worker !== worker) return;

@@ -11,6 +11,7 @@ export const known_names = {
   CurrencyIdentification: 'Scroll of Wisdom', CurrencyAtlasPassiveRefund: 'Orb of Unmaking', CurrencyInstillingOrb: 'Instilling Orb', CurrencyEnkindlingOrb: 'Enkindling Orb', CurrencyHinekorasLock: "Hinekora’s Lock",
 };
 export const currency_name = id => known_names[id.split('/').at(-1)] ?? id.split('/').at(-1).replace(/([a-z])([A-Z])/g, '$1 $2');
+export const has_historical_stock = edge => edge.kind === 'vendor' || edge.historical_low_stock > 0 && edge.historical_high_stock > 0;
 export const profit_pct = rates => (rates.reduce((product, rate) => product * rate, 1) - 1) * 100;
 
 export function rotate_cycle(cycle, start) {
@@ -39,6 +40,7 @@ export function simulate_cycle(legs, budget, haircut_bps) {
 export function rank_cycles(league, options) {
   return league.cycles.filter(cycle => cycle.path.includes(options.start)).map(cycle => rotate_cycle(cycle, options.start))
     .filter(cycle => options.include_vendors !== false || cycle.legs.every(leg => leg.kind !== 'vendor'))
+    .filter(cycle => cycle.legs.every(has_historical_stock))
     .filter(cycle => !options.vendor_only || cycle.legs.some(leg => leg.kind === 'vendor'))
     .filter(cycle => cycle.legs.every(leg => leg.kind === 'vendor' || leg.input_volume >= options.min_volume && leg.output_volume >= options.min_volume))
     .map(cycle => ({...cycle, simulation: simulate_cycle(cycle.legs, options.budget, options.haircut_bps)}))
@@ -53,7 +55,7 @@ export function quote_recipe(recipe, edges, batches, item_cost, haircut_bps) {
   const missing = [];
   const quote = (id, quantity, buying) => {
     if (id === chaos) return quantity;
-    const edge = edges.find(edge => edge.kind === 'market' && edge.from === (buying ? chaos : id) && edge.to === (buying ? id : chaos));
+    const edge = edges.find(edge => edge.kind === 'market' && has_historical_stock(edge) && edge.from === (buying ? chaos : id) && edge.to === (buying ? id : chaos));
     if (!edge) { missing.push(currency_name(id)); return 0; }
     const amount = BigInt(quantity), input = BigInt(edge.input_volume), output = BigInt(edge.output_volume), factor = BigInt(10000 - haircut_bps);
     const numerator = buying ? amount * input * 10000n : amount * output * factor;
@@ -64,7 +66,7 @@ export function quote_recipe(recipe, edges, batches, item_cost, haircut_bps) {
   };
   const cost = Object.entries(recipe.inputs).reduce((sum, [id, amount]) => sum + quote(id, amount * batches, true), item_cost * batches);
   const returned = Object.entries(recipe.outputs).reduce((sum, [id, amount]) => sum + quote(id, amount * batches, false), 0);
-  if (missing.length) throw new Error('Missing direct Chaos market quote: ' + [...new Set(missing)].join(', ') + '. No profit estimate is available.');
+  if (missing.length) throw new Error('Missing direct Chaos market quote with positive historical stock: ' + [...new Set(missing)].join(', ') + '. No profit estimate is available.');
   return {cost, returned, profit: returned - cost, profit_pct: cost > 0 ? (returned / cost - 1) * 100 : null};
 }
 
@@ -75,6 +77,7 @@ export function search_cycles(league, options) {
   if (!Array.isArray(league.edges)) throw new Error('The snapshot has no currency graph.');
   const graph = new Map(), reverse = new Map();
   for (const edge of league.edges) {
+    if (!has_historical_stock(edge)) continue;
     if (edge.kind === 'vendor' ? options.include_vendors === false : edge.input_volume < options.min_volume || edge.output_volume < options.min_volume) continue;
     if (!graph.has(edge.from)) graph.set(edge.from, []);
     graph.get(edge.from).push(edge);

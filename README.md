@@ -74,7 +74,7 @@ profit_percent = 100 * (ending_balance / starting_balance - 1)
 
 The historical range uses the two complete ratio vectors reported by GGG. Each vector is converted to a directed rate, then the rates are ordered into low and high values. Multiplying the low rates and high rates across a cycle gives the displayed range before rounding and haircut.
 
-Pairs with zero volume, invalid ratios, or a central rate outside the reported range are skipped. The volume filter applies independently to both sides of every market trade. Vendor quantities are recipe batch sizes, not observed liquidity.
+Pairs with zero volume, invalid ratios, or a central rate outside the reported range are skipped. The volume filter applies independently to both sides of every market trade. Market legs with zero or missing minimum or maximum historical output stock are excluded from cycle searches and recipe quotes. Fixed vendor trades are exempt. A zero minimum means stock reached zero at some point during the hour, not necessarily that nobody traded. Positive historical stock does not establish current liquidity. Vendor quantities are recipe batch sizes, not observed liquidity.
 
 ## Vendor recipes
 

@@ -6,7 +6,7 @@
   <meta name="description" content="Explore historical Path of Exile currency cycles, estimated profit percentages, and budget calculations using GGG exchange data.">
   <title>PoE Arbitrage</title>
   <link rel="icon" href="./favicon.svg?v=20261002" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css?v=audit329-v1">
+  <link rel="stylesheet" href="./style.css?v=stock-filter-v1">
 </head>
 <body>
 <main>
@@ -51,12 +51,12 @@
     <p>The central rate is output currency traded divided by input currency traded during the same GGG hour. These independently observed pair ratios can disagree across a cycle. A positive result is a historical candidate, not proof that the trades were simultaneously available.</p>
     <p>Cycle profit uses your starting amount, applies the selected haircut at every market trade, and rounds each output down to a whole unit. This is a synthetic unit-fill model; hourly averages do not reveal actual order lot sizes. Vendor batches are rounded down before multiplying their exact reward, with no haircut. Unspent vendor inputs and intermediate remainders are excluded from the ending amount.</p>
     <p>The historical range multiplies the lowest and highest observed pair rates. It is a scenario range before rounding and haircut, not a confidence interval or a guaranteed bound on future returns. Its extrema may have occurred at different times.</p>
-    <p>The volume filter requires both currencies in every market pair to have traded at least the entered amount during that hour. Counts in different currencies are not directly comparable. Historical stock is shown only as context and is never treated as current liquidity. Gold costs are unavailable here and are excluded from profit.</p>
+    <p>The volume filter requires both currencies in every market pair to have traded at least the entered amount during that hour. Counts in different currencies are not directly comparable. Market legs are excluded if their minimum or maximum historical output stock is zero or missing. This filter also applies to recipe market quotes. Fixed vendor legs are exempt. Positive historical stock is not evidence of current liquidity. Gold costs are unavailable here and are excluded from profit.</p>
     <p>Vendor rules are documented 3.29 non-Ruthless rules applied to the historical market snapshot, not a reconstruction of old patch rules. Vendors are disabled for Ruthless leagues. Only quoted currencies are added to the graph; currency baskets are evaluated separately. Faustus exchange trades already appear in the market feed.</p>
     <p>Only pairs with both item IDs under GGG’s Currency category are scanned. The scanner searches cycles from two trades up to your maximum (2–8), including the closing trade. Currencies cannot repeat before returning to the start. The reverse direction remains separate. Searches stop after two million edge checks or 25,000 matching cycles; partial results are explicitly labelled, and their statistics describe only the cycles found. Unknown currency names display a readable version of their internal identifier.</p>
   </details>
   <footer><p>This product isn't affiliated with or endorsed by Grinding Gear Games in any way.</p><a href="https://github.com/timeolord/poe-arbitrage">Source repository</a></footer>
 </main>
-<script type="module" src="./app.mjs?v=audit329-v1"></script>
+<script type="module" src="./app.mjs?v=stock-filter-v1"></script>
 </body>
 </html>

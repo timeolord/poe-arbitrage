@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {profit_pct, simulate_cycle, rotate_cycle, rank_cycles} from '../web/core.mjs';
 
-const leg = (from, to, input_volume, output_volume) => ({from, to, input_volume, output_volume});
+const leg = (from, to, input_volume, output_volume) => ({from, to, input_volume, output_volume, historical_low_stock:100, historical_high_stock:200});
 const cycle = {path:['a','b','c'], legs:[leg('a','b',1,2), leg('b','c',1,3), leg('c','a',5,1)], profit_pct:20};
 
 test('cycle profit is a compounded percentage', () => {
@@ -75,4 +75,23 @@ test('3.29 catalogue excludes the removed chromatic purchase', async () => {
   const catalog = JSON.parse(await readFile(new URL('../web/vendor_recipes.json', import.meta.url)));
   assert.ok(!catalog.recipes.some(r=>r.id==='buy_CurrencyRerollSocketColours'));
   assert.ok(catalog.recipes.every(r=>r.reviewed_patch==='3.29'));
+});
+
+test('zero or missing stock excludes market legs but preserves vendors', async () => {
+  const {search_cycles, has_historical_stock, quote_recipe} = await import('../web/core.mjs');
+  const options = {start:'a',budget:100,haircut_bps:0,min_volume:1,min_profit:0,max_trades:3};
+  const edges = cycle.legs.map(e=>({...e,kind:'market',rate:e.output_volume/e.input_volume,low_rate:0.1,high_rate:3}));
+  assert.equal(search_cycles({edges},options).cycles.length,1);
+  for (const field of ['historical_low_stock','historical_high_stock']) {
+    const bad_edges = edges.map((e,i)=>i===1?{...e,[field]:0}:e);
+    assert.equal(search_cycles({edges:bad_edges},options).cycles.length,0);
+    assert.equal(rank_cycles({cycles:[{...cycle,legs:bad_edges}]},options).length,0);
+  }
+  assert.equal(has_historical_stock({kind:'market'}),false);
+  assert.equal(has_historical_stock({kind:'vendor',historical_low_stock:0,historical_high_stock:0}),true);
+  const vendor = {...edges[1],kind:'vendor',historical_low_stock:0,historical_high_stock:0};
+  assert.equal(search_cycles({edges:[edges[0],vendor,edges[2]]},options).cycles.length,1);
+  const chaos = 'Metadata/Items/Currency/CurrencyRerollRare';
+  const recipe = {kind:'fixed',inputs:{a:1},outputs:{[chaos]:1}};
+  assert.throws(()=>quote_recipe(recipe,[{...leg(chaos,'a',1,1),kind:'market',historical_low_stock:0}],1,0,0),/positive historical stock/);
 });
