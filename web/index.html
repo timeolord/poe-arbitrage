@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore historical Path of Exile currency cycles, estimated profit percentages, and budget calculations using GGG exchange data.">
+  <title>PoE Arbitrage</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<main>
+  <header><div><p class="eyebrow">PATH OF EXILE / MARKET RESEARCH</p><h1>Currency arbitrage</h1></div><span class="tag">Historical data</span></header>
+  <p class="intro">Find three-trade currency cycles. Compare estimated returns, then check each rate in game.</p>
+  <div class="source-line"><span id="snapshot_time">Loading GGG snapshot…</span><a id="source_link" href="https://www.pathofexile.com/developer/docs/reference#currencyexchange" target="_blank" rel="noreferrer">GGG source</a></div>
+  <form id="controls">
+    <label>League<select id="league" disabled></select></label>
+    <label>Starting currency<select id="start" disabled></select></label>
+    <label>Starting amount<input id="budget" type="number" value="1000" min="1" max="1000000000" step="1" required></label>
+    <label>Haircut per trade (%)<input id="haircut" type="number" value="1" min="0" max="99" step="0.01" required></label>
+    <label>Minimum profit (%)<input id="min_profit" type="number" value="0.01" step="0.01" required></label>
+    <label>Minimum volume per side<input id="min_volume" type="number" value="10" min="1" step="1" required></label>
+  </form>
+  <p id="error" class="error" role="alert" hidden></p>
+  <section class="stats" aria-label="cycle statistics">
+    <div><span>Matching cycles</span><strong id="cycle_count">—</strong></div>
+    <div><span>Best modeled return</span><strong id="best_return">—</strong></div>
+    <div><span>Median modeled return</span><strong id="median_return">—</strong></div>
+    <div><span>Active currency pairs</span><strong id="pair_count">—</strong></div>
+  </section>
+  <section class="results"><div class="section-heading"><h2>Cycle opportunities</h2><span id="result_count" aria-live="polite">Loading…</span></div>
+    <div class="table-wrap"><table><thead><tr><th>Trade cycle</th><th>Cycle profit</th><th>Ending amount</th><th>Profit amount</th><th>Historical range</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+    <p id="empty" hidden>No cycles match these settings. Try lowering the minimum volume or profit, or selecting another starting currency.</p>
+    <button id="show_more" type="button" hidden>Show more cycles</button>
+  </section>
+  <section id="details" hidden aria-labelledby="detail_title"><div class="section-heading"><h2 id="detail_title">Cycle details</h2><button id="close_details" type="button">Close</button></div><div id="detail_content"></div></section>
+  <details class="method"><summary>How to read these numbers</summary>
+    <p>The central rate is output currency traded divided by input currency traded during the same GGG hour. These independently observed pair ratios can disagree across a cycle. A positive result is a historical candidate, not proof that the trades were simultaneously available.</p>
+    <p>Cycle profit uses your starting amount, applies the selected haircut at every trade, and rounds each output down to a whole unit. This is a synthetic unit-fill model; hourly averages do not reveal actual order lot sizes. Intermediate remainders are excluded from the ending amount.</p>
+    <p>The historical range multiplies the lowest and highest observed pair rates. It is a scenario range before rounding and haircut, not a confidence interval or a guaranteed bound on future returns. Its extrema may have occurred at different times.</p>
+    <p>The volume filter requires both currencies in every pair to have traded at least the entered amount during that hour. Counts in different currencies are not directly comparable. Historical stock is shown only as context and is never treated as current liquidity. Gold costs are unavailable here and are excluded from profit.</p>
+    <p>Only pairs with both item IDs under GGG’s Currency category are scanned. Triangular cycles are deduplicated by rotation; the reverse direction remains separate. Unknown currency names display a readable version of their internal identifier.</p>
+  </details>
+  <footer><p>This product isn't affiliated with or endorsed by Grinding Gear Games in any way.</p><a href="https://github.com/timeolord/poe-arbitrage">Source repository</a></footer>
+</main>
+<script type="module" src="./app.mjs"></script>
+</body>
+</html>
