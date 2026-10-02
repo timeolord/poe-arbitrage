@@ -264,3 +264,54 @@ test('click efficiency ranks less laborious cycles above higher total profits', 
   assert.equal(quote.clicks.profit_per_click,quote.profit/12);
   assert.equal(quote_recipe({kind:'fixed',inputs:{[chaos]:1},outputs:{[chaos]:2}},[],10,0,0).clicks.total,10);
 });
+
+test('panel quotes discover profitable cycles without changing snapshot liquidity or vendor batches', async () => {
+  const {apply_market_quotes,chaos_id,common_currencies,search_cycles,quote_recipe} = await import('../web/core.mjs');
+  const currency = common_currencies[3], other = common_currencies[4];
+  const edge = (from,to,x,y,kind='market') => ({...leg(from,to,x,y),kind,rate:y/x,low_rate:y/x,high_rate:y/x});
+  const league = {edges:[edge(chaos_id,currency,100,100),edge(currency,chaos_id,100,90),edge(currency,other,3,1,'vendor'),edge(other,chaos_id,100,100)]};
+  const original = structuredClone(league);
+  const options = {start:chaos_id,budget:100,haircut_bps:0,min_volume:50,min_stock:100,min_profit:1,max_trades:2};
+  assert.equal(search_cycles(league,options).cycles.length,0);
+  const adjusted = apply_market_quotes(league,[{currency,buy:{input:'1',output:'2'},sell:{input:'2',output:'1.2'}}]);
+  const found = search_cycles(adjusted,options).cycles;
+  assert.equal(found.length,1);
+  assert.equal(found[0].simulation.profit,20);
+  assert.equal(found[0].simulation.clicks.profit_per_click,10);
+  assert.equal(found[0].low_profit_pct, -9.999999999999998);
+  assert.deepEqual(league,original);
+  assert.deepEqual(adjusted.edges[2],original.edges[2]);
+  assert.equal(adjusted.edges[0].historical_input_volume,100);
+  assert.equal(search_cycles(adjusted,{...options,min_volume:101}).cycles.length,0);
+  assert.equal(search_cycles(adjusted,{...options,min_stock:101}).cycles.length,0);
+  assert.equal(quote_recipe({kind:'fixed',inputs:{[currency]:1},outputs:{[chaos_id]:1}},adjusted.edges,100,0,0).profit,50);
+});
+
+test('panel directions are independent and blank quotes restore the snapshot', async () => {
+  const {apply_market_quotes,chaos_id,common_currencies,search_cycles} = await import('../web/core.mjs');
+  const currency = common_currencies[0];
+  const edges = [leg(chaos_id,currency,100,100),leg(currency,chaos_id,100,100)].map(e=>({...e,kind:'market',rate:1,low_rate:1,high_rate:1}));
+  const league = {edges};
+  const adjusted = apply_market_quotes(league,[{currency,buy:{input:'0.1',output:'0.3'},sell:{input:'',output:''}}]);
+  assert.equal(adjusted.edges[0].rate,3);
+  assert.deepEqual(adjusted.edges[1],edges[1]);
+  assert.deepEqual(apply_market_quotes(league,[]),league);
+  assert.deepEqual(apply_market_quotes(league,[{currency,buy:{input:' ',output:''}}]),league);
+  const options = {start:chaos_id,budget:100,haircut_bps:100,min_volume:50,min_profit:0,max_trades:2};
+  assert.equal(search_cycles(adjusted,options).cycles[0].simulation.end,294);
+  const loss = apply_market_quotes(league,[{currency,buy:{input:'1',output:'0.1'}}]);
+  assert.equal(search_cycles(loss,options).cycles.length,0);
+});
+
+test('panel rejects partial, invalid, duplicate and absent quotes atomically', async () => {
+  const {apply_market_quotes,chaos_id,common_currencies} = await import('../web/core.mjs');
+  const currency = common_currencies[0];
+  const league = {edges:[{...leg(chaos_id,currency,100,100),kind:'market'}]};
+  const original = structuredClone(league);
+  for (const buy of [{input:'',output:'1'},{input:'1',output:''},{input:'0',output:'1'},{input:'NaN',output:'1'}]) assert.throws(()=>apply_market_quotes(league,[{currency,buy}]),/Quote/);
+  assert.throws(()=>apply_market_quotes(league,[{currency,sell:{input:'1',output:'1'}}]),/No historical/);
+  const quote = {currency,buy:{input:'1',output:'2'}};
+  assert.throws(()=>apply_market_quotes(league,[quote,quote]),/Duplicate/);
+  assert.throws(()=>apply_market_quotes(league,[{currency:'unknown'}]),/common/);
+  assert.deepEqual(league,original);
+});
