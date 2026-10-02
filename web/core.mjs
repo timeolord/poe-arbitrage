@@ -36,11 +36,19 @@ export function gold_summary(trades, profit, fees) {
   return {leg_costs, missing, total, gold_per_profit: total !== null && profit > 0 ? total / profit : null, profit_per_100k: total > 0 && profit > 0 ? profit * 100000 / total : null};
 }
 
+export function click_summary(leg_counts, profit) {
+  if (!leg_counts.every(count => Number.isSafeInteger(count) && count >= 0)) throw new Error('Invalid click count.');
+  const sum = leg_counts.reduce((sum, count) => sum + BigInt(count), 0n);
+  if (sum > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error('Click total exceeds supported precision.');
+  const total = Number(sum);
+  return {leg_counts, total, profit_per_click:total > 0 ? profit / total : null};
+}
+
 const within_gold_budget = (simulation, options) => options.gold_budget == null || simulation.gold.total !== null && simulation.gold.total <= options.gold_budget;
-const compare_cycles = options => (a, b) => (options.sort_by === 'gold_efficiency' ? (b.simulation.gold.profit_per_100k ?? -Infinity) - (a.simulation.gold.profit_per_100k ?? -Infinity) : 0) || b.simulation.profit_pct - a.simulation.profit_pct || b.profit_pct - a.profit_pct;
+const compare_cycles = options => (a, b) => (options.sort_by === 'gold_efficiency' ? (b.simulation.gold.profit_per_100k ?? -Infinity) - (a.simulation.gold.profit_per_100k ?? -Infinity) : options.sort_by === 'click_efficiency' ? (b.simulation.clicks.profit_per_click ?? -Infinity) - (a.simulation.clicks.profit_per_click ?? -Infinity) : 0) || b.simulation.profit_pct - a.simulation.profit_pct || b.profit_pct - a.profit_pct;
 function validate_gold_options(options) {
   if (options.gold_budget != null && (!Number.isSafeInteger(options.gold_budget) || options.gold_budget < 0)) throw new Error('Gold budget must be a nonnegative whole number.');
-  if (options.sort_by != null && !['profit', 'gold_efficiency'].includes(options.sort_by)) throw new Error('Invalid sort order.');
+  if (options.sort_by != null && !['profit', 'gold_efficiency', 'click_efficiency'].includes(options.sort_by)) throw new Error('Invalid sort order.');
 }
 
 export function rotate_cycle(cycle, start) {
@@ -52,18 +60,19 @@ export function rotate_cycle(cycle, start) {
 export function simulate_cycle(legs, budget, haircut_bps, fees = null) {
   if (!Number.isSafeInteger(budget) || budget < 1 || !Number.isInteger(haircut_bps) || haircut_bps < 0 || haircut_bps >= 10000) throw new Error('invalid budget or haircut');
   const amounts = [BigInt(budget)];
-  const leftovers = [];
+  const leftovers = [], leg_clicks = [];
   for (const leg of legs) {
     if (!Number.isSafeInteger(leg.input_volume) || !Number.isSafeInteger(leg.output_volume) || leg.input_volume <= 0 || leg.output_volume <= 0) throw new Error('invalid volume');
     const input = BigInt(leg.input_volume), output = BigInt(leg.output_volume);
     const vendor = leg.kind === 'vendor';
+    leg_clicks.push(vendor ? Number(amounts.at(-1) / input) : amounts.at(-1) > 0n ? 1 : 0);
     leftovers.push(vendor ? Number(amounts.at(-1) % input) : 0);
     const next = vendor ? amounts.at(-1) / input * output : amounts.at(-1) * output * BigInt(10000 - haircut_bps) / (input * 10000n);
     if (next > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error('amount exceeds supported precision');
     amounts.push(next);
   }
   const end = Number(amounts.at(-1));
-  return {amounts: amounts.map(Number), leftovers, end, profit: end - budget, profit_pct: (end / budget - 1) * 100,
+  return {clicks:click_summary(leg_clicks, end - budget), amounts: amounts.map(Number), leftovers, end, profit: end - budget, profit_pct: (end / budget - 1) * 100,
     gold: gold_summary(legs.map((leg, i) => ({...leg, quantity:Number(amounts[i + 1])})), end - budget, fees)};
 }
 
@@ -126,7 +135,7 @@ export function quote_recipe(recipe, edges, batches, item_cost, haircut_bps, fee
   const cost = Object.entries(recipe.inputs).reduce((sum, [id, amount]) => sum + quote(id, amount * batches, true), item_cost * batches);
   const returned = Object.entries(recipe.outputs).reduce((sum, [id, amount]) => sum + quote(id, amount * batches, false), 0);
   if (missing.length) throw new Error(`Missing direct Chaos market quote with positive historical stock of at least ${min_stock}: ` + [...new Set(missing)].join(', ') + '. No profit estimate is available.');
-  return {cost, returned, profit: returned - cost, profit_pct: cost > 0 ? (returned / cost - 1) * 100 : null, gold:gold_summary(trades, returned - cost, fees)};
+  return {cost, returned, profit: returned - cost, profit_pct: cost > 0 ? (returned / cost - 1) * 100 : null, clicks:click_summary([...trades.map(() => 1), batches], returned - cost), gold:gold_summary(trades, returned - cost, fees)};
 }
 
 export function search_cycles(league, options) {

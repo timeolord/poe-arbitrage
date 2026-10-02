@@ -1,4 +1,4 @@
-import {search_cycles} from './core.mjs?v=manual-rates-v1';
+import {search_cycles} from './core.mjs?v=click-profit-v1';
 
 self.onmessage = ({data}) => {
   try {

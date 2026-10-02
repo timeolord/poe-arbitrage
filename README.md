@@ -8,7 +8,7 @@ Live at [www.melkyway.ca/poe-arbitrage](https://www.melkyway.ca/poe-arbitrage/).
 
 The scanner treats currencies as a directed graph, with exchange rates calculated from traded volumes. The dashboard searches market and vendor cycles from two trades up to the user’s maximum (2–8), including the return trade. Each currency appears once before returning to the starting currency, and leagues remain separate.
 
-The dashboard simulates each cycle using a whole-unit starting balance. It shows the ending balance, profit percentage, historical rate range, estimated gold fees, gold per unit of profit, and details for each trade. Filters select the league, starting currency, minimum profit, minimum traded volume, minimum historical output stock, maximum trades, and an optional gold budget. Cycles can be sorted by profit percentage or profit per 100,000 gold. An optional haircut reduces the estimated return on each market trade to model slippage. Fixed vendor trades use exact whole batches without a haircut.
+The dashboard simulates each cycle using a whole-unit starting balance. It shows the ending balance, profit percentage, historical rate range, estimated gold fees, gold per unit of profit, and details for each trade. Filters select the league, starting currency, minimum profit, minimum traded volume, minimum historical output stock, maximum trades, and an optional gold budget. Cycles can be sorted by profit percentage, profit per 100,000 gold, or profit per click. An optional haircut reduces the estimated return on each market trade to model slippage. Fixed vendor trades use exact whole batches without a haircut.
 
 Only quoted currency items enter the cycle graph. Currency recipes have a separate calculator that values every input and reward against direct historical Chaos market quotes. The catalogue contains only deterministic currency exchanges.
 
@@ -85,6 +85,12 @@ A vendor leg returns `floor(amount / input_batch) * output_batch`. Unspent input
 The recipe calculator buys each currency ingredient with Chaos Orbs using a direct quote, rounding the required Chaos up. It then sells every currency reward back to Chaos and rounds down. Profit percentage is `100 * (return / total_cost - 1)`. Missing quotes suppress estimates, and a zero cost has no defined percentage. Gold estimates include purchases of currency ingredients and sales of currency rewards. Direct Chaos inputs and outputs need no additional market order. Available orders, travel time and gold fees are not supplied by GGG's hourly feed; fees come from the separate table described below.
 
 The catalogue contains 16 fixed exchanges and two currency baskets: Fusing plus Chromatic to Jeweller, and the Mirror sale with multiple currency rewards. Equipment, gem, flask, quest-item and map recipes, random exchanges, retired recipes and unused references are excluded. Quoted adjacent essence upgrades remain in the scanner. Each catalogue entry links its rate reference and the 3.29 patch notes. The review checks documented rates against patch changes; it is not an in-game verification. [GGG removed Jeweller’s-to-Chromatic purchases in 3.29](https://www.pathofexile.com/forum/view-thread/3985332), so that exchange is excluded.
+
+## Click efficiency
+
+The browser estimates one click for each Faustus market leg with a nonzero input. A vendor leg requires `floor(input_amount / input_batch)` clicks, one for each completed recipe batch, even when the batch returns multiple items. Leftovers add no clicks. Total clicks include the closing trade, and profit per click is `(ending_balance - starting_balance) / total_clicks` in the selected starting currency. Losses have negative efficiency; zero clicks leave it undefined. Setup, inventory movement, travel, cancellations and reposting are excluded from this model.
+
+Cycle results show total clicks and profit per click, with per-leg counts in the inspector. Manual price scenarios recalculate the vendor batches as balances change. Recipe estimates count each requested vendor batch plus one click per market ingredient purchase or reward sale. Choose Profit per click to rank cycles by this estimate. The Rust command line continues to report currency returns.
 
 ## Gold costs
 

@@ -6,7 +6,7 @@
   <meta name="description" content="Explore historical Path of Exile currency cycles, estimated profit percentages, and budget calculations using GGG exchange data.">
   <title>PoE Arbitrage</title>
   <link rel="icon" href="./favicon.svg?v=20261002" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css?v=manual-rates-v1">
+  <link rel="stylesheet" href="./style.css?v=click-profit-v1">
 </head>
 <body>
 <main>
@@ -24,7 +24,7 @@
     <label>Maximum trades<input id="max_trades" type="number" value="4" min="2" max="8" step="1" required></label>
     <label>Route types<select id="route_type"><option value="all">Market and vendor</option><option value="vendor">Includes vendor</option><option value="market">Market only</option></select></label>
     <label>Gold budget (blank = unlimited)<input id="gold_budget" type="number" min="0" max="9007199254740991" step="1" placeholder="Unlimited"></label>
-    <label>Sort cycles<select id="sort_by"><option value="profit">Profit percentage</option><option value="gold_efficiency">Profit per 100,000 gold</option></select></label>
+    <label>Sort cycles<select id="sort_by"><option value="profit">Profit percentage</option><option value="gold_efficiency">Profit per 100,000 gold</option><option value="click_efficiency">Profit per click</option></select></label>
   </form>
   <p id="search_status" class="secondary" role="status"></p>
   <p id="error" class="error" role="alert" hidden></p>
@@ -35,7 +35,7 @@
     <div><span>Active currency pairs</span><strong id="pair_count">—</strong></div>
   </section>
   <section class="results"><div class="section-heading"><h2>Cycle opportunities</h2><span id="result_count" aria-live="polite">Loading…</span></div>
-    <div class="table-wrap"><table><thead><tr><th>Trade cycle</th><th>Cycle profit</th><th>Ending amount</th><th>Profit amount</th><th>Estimated gold</th><th>Gold per currency earned</th><th>Historical range</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="table-wrap"><table><thead><tr><th>Trade cycle</th><th>Cycle profit</th><th>Ending amount</th><th>Profit amount</th><th>Estimated clicks</th><th>Profit per click</th><th>Estimated gold</th><th>Gold per currency earned</th><th>Historical range</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
     <p id="empty" hidden>No cycles match these settings. Try increasing the gold budget, lowering the minimum stock, volume or profit, or selecting another starting currency. A gold budget excludes cycles with unknown fees.</p>
     <button id="show_more" type="button" hidden>Show more cycles</button>
   </section>
@@ -55,6 +55,7 @@
     <p>Cycle profit uses your starting amount, applies the selected haircut at every market trade, and rounds each output down to a whole unit. This is a synthetic unit-fill model; hourly averages do not reveal actual order lot sizes. Vendor batches are rounded down before multiplying their exact reward, with no haircut. Unspent vendor inputs and intermediate remainders are excluded from the ending amount.</p>
     <p>The historical range multiplies the lowest and highest observed pair rates. It is a scenario range before rounding and haircut, not a confidence interval or a guaranteed bound on future returns. Its extrema may have occurred at different times.</p>
     <p>The volume filter requires both currencies in every market pair to have traded at least the entered amount during that hour. Counts in different currencies are not directly comparable. Every market leg must have minimum and maximum historical output stock at or above the selected stock threshold. The default is 1; zero or missing stock is always excluded. The threshold counts units of the currency received, not units of the starting currency. This filter also applies to recipe market quotes. Fixed vendor legs are exempt. Positive historical stock is not evidence of current liquidity.</p>
+    <p>Profit per click divides modeled currency profit by estimated clicks. Each market leg with a nonzero input counts as one Faustus trade. Each completed vendor batch counts as one click, using the input quantity divided by the fixed batch size and rounded down. Vendor leftovers add no clicks. Recipe estimates count one click per vendor batch plus one per market purchase or sale. Setup, inventory movement, travel and cancellations are excluded. Sorting compares profit in your selected starting currency.</p>
     <p id="gold_source"></p>
     <p>Estimated gold = received quantity × the receiving currency's fee, rounded up separately for each market leg. Vendor trades have no exchange fee. The calculator assumes one listing per market leg, with no cancellations or reposting. Fractional fees use conservative upward rounding that has not been verified in game. Missing fees leave the total and efficiency unavailable; a gold budget excludes those cycles. Fees are current patch rules applied to historical prices, not historical fees. <a href="https://poedb.tw/us/Currency_Exchange" target="_blank" rel="noreferrer">Gold fee source</a>.</p>
     <p>Gold per currency earned = total gold ÷ (ending amount − starting amount). Profit per 100,000 gold = (ending amount − starting amount) × 100,000 ÷ total gold. These ratios require positive profit, and the second also requires positive gold. Gold remains a separate expense rather than being subtracted from the currency balance. Recipe estimates include buying every ingredient and selling every reward back to Chaos; direct Chaos inputs and outputs incur no additional exchange fee.</p>
@@ -63,6 +64,6 @@
   </details>
   <footer><p>This product isn't affiliated with or endorsed by Grinding Gear Games in any way.</p><a href="https://github.com/timeolord/poe-arbitrage">Source repository</a></footer>
 </main>
-<script type="module" src="./app.mjs?v=manual-rates-v1"></script>
+<script type="module" src="./app.mjs?v=click-profit-v1"></script>
 </body>
 </html>
