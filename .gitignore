@@ -1,0 +1,6 @@
+/target/
+/.direnv/
+/data/
+/web/data/
+__pycache__/
+*.zip
