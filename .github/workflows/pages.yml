@@ -1,0 +1,55 @@
+name: Refresh and publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test scanner
+        run: cargo test --locked
+      - name: Test calculator
+        run: node --test tests/core.test.mjs
+      - name: Fetch completed exchange hour
+        run: python3 scripts/fetch_snapshot.py
+      - name: Scan cycles
+        run: cargo run --locked --release -- data/snapshot.json web/data/analysis.json
+      - name: Archive source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: ggg-snapshot
+          path: data/snapshot.json
+          retention-days: 30
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
