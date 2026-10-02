@@ -51,3 +51,28 @@ test('recipe basket values every input and output and rejects missing quotes', a
   assert.throws(() => quote_recipe(recipe,edges.slice(0,2),1,2,0), /Missing direct Chaos/);
   assert.throws(() => quote_recipe({...recipe,kind:'random'},edges,1,2,0), /no deterministic/);
 });
+
+test('graph search finds longer cycles and counts the closing trade', async () => {
+  const {search_cycles} = await import('../web/core.mjs');
+  const edge = (from,to,rate=1,kind='market') => ({...leg(from,to,100,100*rate),rate,low_rate:rate,high_rate:rate,kind});
+  const league = {edges:[edge('a','b',2),edge('b','c'),edge('c','d'),edge('d','e'),edge('e','a'),edge('b','a'),edge('b','c',3,'vendor'),edge('c','b')]};
+  const options = {start:'a',budget:100,haircut_bps:0,min_volume:1,min_profit:0,max_trades:4};
+  assert.deepEqual(search_cycles(league,options).cycles.map(c=>c.path.length), [2]);
+  const result = search_cycles(league,{...options,max_trades:5});
+  assert.equal(result.complete,true);
+  assert.equal(result.cycles.filter(c=>c.path.length===5).length,2);
+  assert.equal(result.cycles[0].simulation.profit_pct,500);
+  assert.equal(search_cycles(league,{...options,max_trades:5,include_vendors:false}).cycles.filter(c=>c.path.length===5).length,1);
+  assert.equal(search_cycles(league,{...options,max_trades:5,vendor_only:true}).cycles.length,1);
+  assert.ok(result.cycles.every(c=>new Set(c.path).size===c.path.length && c.legs.at(-1).to==='a'));
+  assert.equal(search_cycles(league,{...options,max_checks:1}).complete,false);
+  assert.throws(()=>search_cycles(league,{...options,max_trades:9}), /Maximum trades/);
+  assert.throws(()=>search_cycles(league,{...options,max_trades:2.5}), /Maximum trades/);
+});
+
+test('3.29 catalogue excludes the removed chromatic purchase', async () => {
+  const {readFile} = await import('node:fs/promises');
+  const catalog = JSON.parse(await readFile(new URL('../web/vendor_recipes.json', import.meta.url)));
+  assert.ok(!catalog.recipes.some(r=>r.id==='buy_CurrencyRerollSocketColours'));
+  assert.ok(catalog.recipes.every(r=>r.reviewed_patch==='3.29'));
+});
