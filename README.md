@@ -10,7 +10,7 @@ The scanner treats currencies as a directed graph, with exchange rates calculate
 
 The dashboard simulates each cycle using a whole-unit starting balance. It shows the ending balance, profit percentage, historical rate range, and details for each trade. Filters select the league, starting currency, minimum profit, and minimum traded volume. An optional haircut reduces the estimated return on each market trade to model slippage. Fixed vendor trades use exact whole batches without a haircut.
 
-Only quoted currency items enter the cycle graph. Item recipes have a separate calculator that uses your ingredient cost and values every currency input and reward against direct historical Chaos market quotes. Random recipes and removed trades appear in the sourced catalogue but do not produce profit estimates.
+Only quoted currency items enter the cycle graph. Currency recipes have a separate calculator that values every input and reward against direct historical Chaos market quotes. The catalogue contains only deterministic currency exchanges.
 
 ## Usage
 
@@ -80,9 +80,9 @@ Pairs with zero volume, invalid ratios, or a central rate outside the reported r
 
 A vendor leg returns `floor(amount / input_batch) * output_batch`. Unspent inputs are displayed but excluded from the ending balance. The catalogue uses current non-Ruthless rules against the historical snapshot; it does not reconstruct vendor rules from the snapshot's patch date. Vendor scanning and recipe estimates are disabled for Ruthless leagues.
 
-The recipe calculator buys each currency ingredient with Chaos Orbs using a direct quote, rounding the required Chaos up. It adds the entered item ingredient cost per batch, then sells every currency reward back to Chaos and rounds down. Profit percentage is `100 * (return / total_cost - 1)`. Missing quotes suppress estimates, and a zero cost has no defined percentage. Gear prices, available orders, travel time and gold are not supplied by GGG's hourly feed. Input costs must include every required item; overlapping sell recipes cannot be collected together.
+The recipe calculator buys each currency ingredient with Chaos Orbs using a direct quote, rounding the required Chaos up. It then sells every currency reward back to Chaos and rounds down. Profit percentage is `100 * (return / total_cost - 1)`. Missing quotes suppress estimates, and a zero cost has no defined percentage. Available orders, travel time and gold are not supplied by GGG's hourly feed.
 
-The catalogue covers documented currency-producing equipment, quality, rare-set and currency-basket recipes, plus variable and random exchanges. Equipment crafting, divination cards and undisclosed recipes are outside its scope. Oil upgrades are documented but not scanned because their prices are absent from this currency-only snapshot. Faustus's player market is already represented in the exchange data; Heist target values vary by item. Retired Chisel recipes and quality-currency purchases are excluded, and influenced sets use the Exalted Orb reward introduced in 3.28. Each entry links its reference; inspect the in-game reward before committing items.
+The catalogue contains 17 fixed exchanges and two currency baskets: Fusing plus Chromatic to Jeweller, and the Mirror sale with multiple currency rewards. Equipment, gem, flask, quest-item and map recipes, random exchanges, retired recipes and unused references are excluded. Quoted adjacent essence upgrades remain in the scanner. Each catalogue entry links its reference.
 
 ## Data
 
