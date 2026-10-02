@@ -1,6 +1,6 @@
 {
   "checked_at": "2026-10-02",
-  "ruleset": "PoE 1, current non-Ruthless vendor rules",
+  "ruleset": "PoE 1, 3.29 non-Ruthless vendor rules",
   "recipes": [
     {
       "id": "buy_CurrencyPortal",
@@ -14,7 +14,9 @@
         "Metadata/Items/Currency/CurrencyPortal": 1
       },
       "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Vendor",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "buy_CurrencyUpgradeToMagic",
@@ -28,7 +30,9 @@
         "Metadata/Items/Currency/CurrencyUpgradeToMagic": 1
       },
       "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Vendor",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "buy_CurrencyAddModToMagic",
@@ -42,7 +46,9 @@
         "Metadata/Items/Currency/CurrencyAddModToMagic": 1
       },
       "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Vendor",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "buy_CurrencyRerollMagic",
@@ -56,11 +62,13 @@
         "Metadata/Items/Currency/CurrencyRerollMagic": 1
       },
       "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Vendor",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "buy_CurrencyRerollSocketNumbers",
-      "name": "Buy Jeweller\u2019s Orb",
+      "name": "Buy Jeweller’s Orb",
       "kind": "fixed",
       "vendor": "Yeena, Act 2",
       "inputs": {
@@ -70,21 +78,9 @@
         "Metadata/Items/Currency/CurrencyRerollSocketNumbers": 1
       },
       "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
-    },
-    {
-      "id": "buy_CurrencyRerollSocketColours",
-      "name": "Buy Chromatic Orb",
-      "kind": "fixed",
-      "vendor": "Yeena, Act 2",
-      "inputs": {
-        "Metadata/Items/Currency/CurrencyRerollSocketNumbers": 3
-      },
-      "outputs": {
-        "Metadata/Items/Currency/CurrencyRerollSocketColours": 1
-      },
-      "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Vendor",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "buy_CurrencyRerollSocketLinks",
@@ -98,7 +94,9 @@
         "Metadata/Items/Currency/CurrencyRerollSocketLinks": 1
       },
       "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Vendor",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "buy_CurrencyUpgradeRandomly",
@@ -112,7 +110,9 @@
         "Metadata/Items/Currency/CurrencyUpgradeRandomly": 1
       },
       "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Vendor",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "buy_CurrencyConvertToNormal",
@@ -126,7 +126,9 @@
         "Metadata/Items/Currency/CurrencyConvertToNormal": 1
       },
       "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Vendor",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "buy_CurrencyPassiveRefund",
@@ -140,7 +142,9 @@
         "Metadata/Items/Currency/CurrencyPassiveRefund": 1
       },
       "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Vendor",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "buy_CurrencyUpgradeToRare",
@@ -154,7 +158,9 @@
         "Metadata/Items/Currency/CurrencyUpgradeToRare": 1
       },
       "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Vendor",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "buy_CurrencyAtlasPassiveRefund",
@@ -168,7 +174,9 @@
         "Metadata/Items/Currency/CurrencyAtlasPassiveRefund": 1
       },
       "requirements": "Purchase from the vendor currency shop. Later acts also offer many of these trades.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.pathofexile.com/forum/view-thread/3229187",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "sell_CurrencyPortal",
@@ -182,11 +190,13 @@
         "Metadata/Items/Currency/CurrencyIdentification": 1
       },
       "requirements": "Sell currency to the vendor. This is separate from purchasing currency.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Scroll_of_Wisdom",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "sell_CurrencyArmourQuality",
-      "name": "Sell Armourer\u2019s Scrap",
+      "name": "Sell Armourer’s Scrap",
       "kind": "fixed",
       "vendor": "Any town vendor",
       "inputs": {
@@ -196,11 +206,13 @@
         "Metadata/Items/Currency/CurrencyIdentification": 2
       },
       "requirements": "Sell currency to the vendor. This is separate from purchasing currency.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Scroll_of_Wisdom",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "sell_CurrencyWeaponQuality",
-      "name": "Sell Blacksmith\u2019s Whetstone",
+      "name": "Sell Blacksmith’s Whetstone",
       "kind": "fixed",
       "vendor": "Any town vendor",
       "inputs": {
@@ -210,7 +222,9 @@
         "Metadata/Items/Currency/CurrencyIdentification": 4
       },
       "requirements": "Sell currency to the vendor. This is separate from purchasing currency.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Scroll_of_Wisdom",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "sell_CurrencyRerollMagic",
@@ -224,7 +238,9 @@
         "Metadata/Items/Currency/CurrencyIdentification": 4
       },
       "requirements": "Sell currency to the vendor. This is separate from purchasing currency.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Scroll_of_Wisdom",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "sell_CurrencyUpgradeToMagic",
@@ -238,7 +254,9 @@
         "Metadata/Items/Currency/CurrencyIdentification": 4
       },
       "requirements": "Sell currency to the vendor. This is separate from purchasing currency.",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Scroll_of_Wisdom",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "jeweller_basket",
@@ -253,7 +271,9 @@
         "Metadata/Items/Currency/CurrencyRerollSocketNumbers": 1
       },
       "requirements": "",
-      "source": "https://www.poewiki.net/wiki/Vendor_recipe_system"
+      "source": "https://www.poewiki.net/wiki/Jeweller%27s_Orb",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     },
     {
       "id": "mirror",
@@ -269,7 +289,11 @@
         "Metadata/Items/Currency/CurrencyModValues": 1
       },
       "requirements": "",
-      "source": "https://www.poewiki.net/wiki/Mirror_of_Kalandra"
+      "source": "https://www.poewiki.net/wiki/Mirror_of_Kalandra",
+      "reviewed_patch": "3.29",
+      "verification": "documented rate; no removal found in 3.29 patch notes"
     }
-  ]
+  ],
+  "patch_source": "https://www.pathofexile.com/forum/view-thread/3985332",
+  "verification": "Documented rates reviewed against GGG’s 3.29 patch notes. Not verified in game. Jeweller’s to Chromatic purchases were removed in 3.29 and are excluded."
 }
