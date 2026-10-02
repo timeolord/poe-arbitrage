@@ -45,7 +45,7 @@ test('recipe basket values every input and output and rejects missing quotes', a
   const chaos = 'Metadata/Items/Currency/CurrencyRerollRare';
   const edges = [{...leg(chaos,'a',3,2),kind:'market'}, {...leg('b',chaos,2,7),kind:'market'}, {...leg('c',chaos,1,3),kind:'market'}];
   const recipe = {kind:'item', inputs:{a:3}, outputs:{b:3,c:1}};
-  const {gold, ...quote} = quote_recipe(recipe,edges,1,2,0);
+  const {gold, clicks, ...quote} = quote_recipe(recipe,edges,1,2,0);
   assert.deepEqual(quote, {cost:7,returned:13,profit:6,profit_pct:(13/7-1)*100});
   assert.equal(gold.total, null);
   assert.equal(quote_recipe(recipe,edges,1,2,1000).cost, 7);
@@ -227,4 +227,40 @@ test('manual decimal rates use exact arithmetic and reject invalid quotes', asyn
   for (const input of ['','0','-1','NaN','Infinity','1e3','0.0000000000001','9007199254740992']) assert.throws(()=>manual_cycle(legs,[{input,output:'1'}],10,0),/Quote/);
   assert.throws(()=>manual_cycle(legs,[],10,0),/each trade/);
   assert.throws(()=>manual_cycle(legs,[{input:'0.000000000001',output:'9007199254740991'}],10,0),/precision/);
+});
+
+test('click counts follow vendor input batches and include the closing market trade', async () => {
+  const {manual_cycle, click_summary} = await import('../web/core.mjs');
+  const legs = [leg('a','b',1,2),{...leg('b','c',3,4),kind:'vendor',rate:4/3},leg('c','a',1,1)];
+  const result = simulate_cycle(legs,10,0);
+  assert.deepEqual(result.amounts,[10,20,24,24]);
+  assert.deepEqual(result.clicks,{leg_counts:[1,6,1],total:8,profit_per_click:14/8});
+  assert.equal(result.leftovers[1],2);
+  assert.deepEqual(simulate_cycle([leg('a','b',1,2),leg('b','a',1,1)],10,0).clicks,{leg_counts:[1,1],total:2,profit_per_click:5});
+  assert.equal(simulate_cycle([{...leg('a','a',20,1),kind:'vendor'}],10,0).clicks.total,0);
+  assert.equal(simulate_cycle([{...leg('a','a',20,1),kind:'vendor'}],10,0).clicks.profit_per_click,null);
+  assert.equal(simulate_cycle([leg('a','a',2,1)],10,0).clicks.profit_per_click,-5);
+  const edited = manual_cycle(legs,[{input:'1',output:'3'},null,{input:'1',output:'1'}],10,0);
+  assert.deepEqual(edited.simulation.clicks.leg_counts,[1,10,1]);
+  assert.equal(edited.simulation.clicks.profit_per_click,30/12);
+  assert.throws(()=>click_summary([Number.MAX_SAFE_INTEGER,1],1),/precision/);
+});
+
+test('click efficiency ranks less laborious cycles above higher total profits', async () => {
+  const {search_cycles,quote_recipe} = await import('../web/core.mjs');
+  const edge = (from,to,x,y,kind='market')=>({...leg(from,to,x,y),kind,rate:y/x,low_rate:y/x,high_rate:y/x});
+  const vendor = [edge('a','b',1,2),edge('b','a',1,1,'vendor')];
+  const market = [edge('a','c',1,1),edge('c','a',10,11)];
+  const league = {edges:[...vendor,...market],cycles:[vendor,market].map(legs=>({path:legs.map(e=>e.from),legs,profit_pct:profit_pct(legs.map(e=>e.rate))}))};
+  const options = {start:'a',budget:100,haircut_bps:0,min_volume:1,min_profit:0,max_trades:2};
+  for (const search of [o=>search_cycles(league,o).cycles,o=>rank_cycles(league,o)]) {
+    assert.deepEqual(search({...options,sort_by:'profit'}).map(c=>c.path[1]),['b','c']);
+    assert.deepEqual(search({...options,sort_by:'click_efficiency'}).map(c=>c.path[1]),['c','b']);
+  }
+  const chaos = 'Metadata/Items/Currency/CurrencyRerollRare';
+  const recipe = {kind:'basket',inputs:{a:1,[chaos]:1},outputs:{b:2,[chaos]:1}};
+  const quote = quote_recipe(recipe,[edge(chaos,'a',1,1),edge('b',chaos,1,2)],10,0,0);
+  assert.equal(quote.clicks.total,12);
+  assert.equal(quote.clicks.profit_per_click,quote.profit/12);
+  assert.equal(quote_recipe({kind:'fixed',inputs:{[chaos]:1},outputs:{[chaos]:2}},[],10,0,0).clicks.total,10);
 });
