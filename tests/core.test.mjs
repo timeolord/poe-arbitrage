@@ -171,3 +171,27 @@ test('fee table records current patch sources and the revised Chromatic fee', as
   assert.equal(gold_cost('Metadata/Items/Currency/HarvestSeedBlue',9,table.items),2);
   for (const [id,item] of Object.entries(table.items)) assert.ok(Number.isSafeInteger(gold_cost(id,100,item && table.items)));
 });
+
+
+test('stock thresholds include equality and reject a low stock dip on any market leg', async () => {
+  const {search_cycles, quote_recipe} = await import('../web/core.mjs');
+  const edges = cycle.legs.map(e=>({...e,kind:'market',rate:e.output_volume/e.input_volume,low_rate:0.1,high_rate:3}));
+  const options = {start:'a',budget:100,haircut_bps:0,min_volume:1,min_profit:0,max_trades:3,min_stock:100};
+  for (const search of [o=>search_cycles({edges},o).cycles,o=>rank_cycles({cycles:[cycle]},o)]) {
+    assert.equal(search(options).length,1);
+    assert.equal(search({...options,min_stock:101}).length,0);
+    for (const min_stock of [0,-1,1.5,NaN,Infinity,Number.MAX_SAFE_INTEGER+1]) assert.throws(()=>search({...options,min_stock}),/Minimum historical stock/);
+  }
+  for (let i=0;i<edges.length;i++) {
+    const dipped = edges.map((edge,j)=>j===i?{...edge,historical_low_stock:99,historical_high_stock:1000}:edge);
+    assert.equal(search_cycles({edges:dipped},options).cycles.length,0);
+    assert.equal(rank_cycles({cycles:[{...cycle,legs:dipped}]},options).length,0);
+    assert.equal(search_cycles({edges:dipped.map((edge,j)=>j===i?{...edge,kind:'vendor'}:edge)},options).cycles.length,1);
+  }
+  const chaos = 'Metadata/Items/Currency/CurrencyRerollRare';
+  const recipe = {kind:'fixed',inputs:{a:1},outputs:{[chaos]:2}};
+  const quotes = [{...leg(chaos,'a',1,1),kind:'market'}];
+  assert.equal(quote_recipe(recipe,quotes,1,0,0,null,100).profit,1);
+  assert.throws(()=>quote_recipe(recipe,quotes,1,0,0,null,101),/at least 101/);
+  assert.throws(()=>quote_recipe(recipe,quotes,1,0,0,null,0),/Minimum historical stock/);
+});
