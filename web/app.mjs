@@ -1,4 +1,4 @@
-import {currency_name, search_cycles, quote_recipe} from './core.mjs?v=stock-threshold-v1';
+import {currency_name, search_cycles, quote_recipe, manual_cycle} from './core.mjs?v=manual-rates-v1';
 
 const by_id = id => document.getElementById(id);
 const format_number = value => new Intl.NumberFormat(undefined, {maximumFractionDigits: 2}).format(value);
@@ -54,27 +54,44 @@ function render_rows() {
   by_id('result_count').textContent = `${Math.min(page_size, ranked.length)} of ${ranked.length} matching cycles`;
 }
 
-function show_details(index) {
+function show_details(index, quotes = null) {
   selected_index = index;
-  const cycle = ranked[index];
+  const historical = ranked[index];
+  const options = read_options();
+  const cycle = quotes ? {...historical, ...manual_cycle(historical.legs, quotes, options.budget, options.haircut_bps, fee_catalog.items)} : historical;
+  const displayed_quotes = quotes ?? historical.legs.map(leg => ({input:String(leg.input_volume), output:String(leg.output_volume)}));
   by_id('details').hidden = false;
-  by_id('detail_content').innerHTML = `${route_html(cycle.path)}<div class="detail-stats">
+  by_id('detail_content').innerHTML = `${route_html(cycle.path)}
+    <form id="leg_quotes"><div class="quote-editor"><h3>Check current prices</h3><p>Enter the amounts you give and receive for each market trade. Vendor batches stay fixed. Recalculate uses your starting amount and haircut, with whole-unit rounding and updated gold fees.</p>
+    ${historical.legs.map((leg, i) => leg.kind === 'vendor' ? `<p>Trade ${i + 1}: fixed vendor batch, ${format_number(leg.input_volume)} ${escape_html(currency_name(leg.from))} → ${format_number(leg.output_volume)} ${escape_html(currency_name(leg.to))}.</p>` : `<div class="quote-row"><span>Trade ${i + 1}</span><label>Give ${escape_html(currency_name(leg.from))}<input data-quote-input="${i}" aria-label="Trade ${i + 1} give ${escape_html(currency_name(leg.from))}" type="text" inputmode="decimal" value="${escape_html(displayed_quotes[i].input)}" required></label><label>Receive ${escape_html(currency_name(leg.to))}<input data-quote-output="${i}" aria-label="Trade ${i + 1} receive ${escape_html(currency_name(leg.to))}" type="text" inputmode="decimal" value="${escape_html(displayed_quotes[i].output)}" required></label></div>`).join('')}
+    <div class="quote-actions"><button type="submit">Recalculate cycle</button><button id="reset_quotes" type="button">Reset historical rates</button></div><p id="quote_status" role="status">${quotes ? 'Manual price scenario. Historical stock and volume remain context; the search results above use historical prices.' : 'Historical price scenario. Change the quote amounts, then recalculate.'}</p><p id="quote_error" class="error" role="alert" hidden></p></div></form>
+    <div class="detail-stats">
     <div><span>Modeled cycle profit</span><strong class="${cycle.simulation.profit_pct >= 0 ? 'positive' : 'negative'}">${format_pct(cycle.simulation.profit_pct)}</strong></div>
     <div><span>Unrounded central return</span><strong>${format_pct(cycle.profit_pct)}</strong></div>
+    <div><span>Profit ${escape_html(currency_name(cycle.path[0]))}</span><strong class="${cycle.simulation.profit >= 0 ? 'positive' : 'negative'}">${format_number(cycle.simulation.profit)}</strong></div>
     <div><span>Ending ${escape_html(currency_name(cycle.path[0]))}</span><strong>${format_number(cycle.simulation.end)}</strong></div>
     <div><span>Estimated gold total</span><strong>${format_gold(cycle.simulation.gold.total)}</strong></div>
     <div><span>Gold per ${escape_html(currency_name(cycle.path[0]))} earned</span><strong>${format_gold(cycle.simulation.gold.gold_per_profit)}</strong></div>
     <div><span>${escape_html(currency_name(cycle.path[0]))} earned per 100,000 gold</span><strong>${format_gold(cycle.simulation.gold.profit_per_100k)}</strong></div></div>
-    <div class="table-wrap"><table><thead><tr><th>Trade</th><th>Input → output</th><th>Estimated gold</th><th>Average rate</th><th>Hourly volumes</th><th>Historical output stock</th></tr></thead><tbody>
+    <div class="table-wrap"><table><thead><tr><th>Trade</th><th>Input → output</th><th>Estimated gold</th><th>Applied rate</th><th>Hourly volumes</th><th>Historical output stock</th></tr></thead><tbody>
     ${cycle.legs.map((leg, i) => `<tr><td>${escape_html(currency_name(leg.from))} → ${escape_html(currency_name(leg.to))}<span class="secondary">${escape_html(leg.vendor ?? 'Currency market')}</span></td>
       <td>${format_number(cycle.simulation.amounts[i])} → ${format_number(cycle.simulation.amounts[i + 1])}${cycle.simulation.leftovers[i] ? `<span class="secondary">${cycle.simulation.leftovers[i]} input left over, excluded</span>` : ''}</td>
       <td>${format_gold(cycle.simulation.gold.leg_costs[i])}<span class="secondary">${leg.kind === 'vendor' ? 'No exchange fee' : 'Fee on received currency'}</span></td>
-      <td>${leg.rate.toPrecision(6)} per input unit<span class="secondary">${leg.low_rate.toPrecision(5)} to ${leg.high_rate.toPrecision(5)}</span></td>
-      <td>${leg.kind === 'vendor' ? 'Fixed batch: ' : 'Hourly: '}${format_number(leg.input_volume)} input / ${format_number(leg.output_volume)} output</td>
+      <td>${leg.rate.toPrecision(6)} per input unit<span class="secondary">${quotes && leg.kind !== 'vendor' ? 'Manual quote' : 'Historical average'}; historical ${leg.low_rate.toPrecision(5)} to ${leg.high_rate.toPrecision(5)}</span></td>
+      <td>${leg.kind === 'vendor' ? 'Fixed batch: ' : 'Hourly: '}${format_number(historical.legs[i].input_volume)} input / ${format_number(historical.legs[i].output_volume)} output</td>
       <td>${leg.kind === 'vendor' ? 'Vendor, no market stock assumption' : `${format_number(leg.historical_low_stock)} to ${format_number(leg.historical_high_stock)}`}</td></tr>`).join('')}</tbody></table></div>
     <p>Return = (ending amount ÷ starting amount − 1) × 100. Gold efficiency divides the total gold cost by the profit, excluding your starting balance. Gold is a separate expense and does not reduce the displayed currency amount.</p>
     <p>Gold estimates use the ${escape_html(fee_catalog.patch)} fee table, reviewed ${escape_html(fee_catalog.reviewed_at)}, and round each market fee up. ${cycle.simulation.gold.missing.length ? `Missing fees: ${cycle.simulation.gold.missing.map(currency_name).map(escape_html).join(', ')}. The total and efficiency are unavailable.` : 'One listing per market leg is assumed; cancellations and reposting are excluded.'} Rates are historical hourly averages; check each order and its gold fee in game.</p>
-    ${cycle.legs.some((leg, i) => leg.kind !== 'vendor' && cycle.simulation.amounts[i] > leg.input_volume) ? '<p>Your modeled trade size exceeds the entire observed hourly input volume on at least one leg. This estimate extrapolates beyond the sample and is especially uncertain.</p>' : ''}`;
+    ${cycle.legs.some((leg, i) => leg.kind !== 'vendor' && cycle.simulation.amounts[i] > historical.legs[i].input_volume) ? '<p>Your modeled trade size exceeds the entire observed hourly input volume on at least one leg. This estimate extrapolates beyond the sample and is especially uncertain.</p>' : ''}`;
+  by_id('leg_quotes').addEventListener('input', () => {by_id('quote_status').textContent = 'Quote edits pending. Recalculate to update the amounts below.';});
+  by_id('leg_quotes').addEventListener('submit', event => {
+    event.preventDefault();
+    try {
+      const values = historical.legs.map((leg, i) => leg.kind === 'vendor' ? null : ({input:document.querySelector(`[data-quote-input="${i}"]`).value, output:document.querySelector(`[data-quote-output="${i}"]`).value}));
+      show_details(index, values);
+    } catch (error) {by_id('quote_error').hidden = false; by_id('quote_error').textContent = error.message; by_id('quote_status').textContent = 'Invalid quote. The amounts below are from the last successful calculation.';}
+  });
+  by_id('reset_quotes').addEventListener('click', () => show_details(index));
   render_rows();
 }
 
@@ -121,7 +138,7 @@ function render() {
       finish_render(league, search_cycles(league, options));
       return;
     }
-    const worker = new Worker('./search_worker.mjs?v=stock-threshold-v1', {type: 'module'});
+    const worker = new Worker('./search_worker.mjs?v=manual-rates-v1', {type: 'module'});
     search_worker = worker;
     worker.onmessage = ({data}) => {
       if (search_worker !== worker) return;
