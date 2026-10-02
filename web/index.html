@@ -6,7 +6,7 @@
   <meta name="description" content="Explore historical Path of Exile currency cycles, estimated profit percentages, and budget calculations using GGG exchange data.">
   <title>PoE Arbitrage</title>
   <link rel="icon" href="./favicon.svg?v=20261002" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css?v=vendors1">
+  <link rel="stylesheet" href="./style.css?v=currency-only1">
 </head>
 <body>
 <main>
@@ -37,11 +37,10 @@
   <section id="details" hidden aria-labelledby="detail_title"><div class="section-heading"><h2 id="detail_title">Cycle details</h2><button id="close_details" type="button">Close</button></div><div id="detail_content"></div></section>
   <section class="recipes" aria-labelledby="recipe_title">
     <div class="section-heading"><h2 id="recipe_title">Vendor recipes</h2><span id="recipe_count"></span></div>
-    <p>Fixed currency trades are included in cycle results above. Item recipes use your total ingredient purchase cost per batch, plus quoted currency ingredients. Results model buying inputs, vendoring, and selling all currency rewards back to Chaos Orbs.</p>
+    <p>Fixed currency trades are included in cycle results above. Compare individual currency recipes by buying their inputs, vendoring, and selling every currency reward back to Chaos Orbs.</p>
     <form id="recipe_controls">
       <label>Recipe<select id="recipe"></select></label>
       <label>Number of batches<input id="recipe_batches" type="number" min="1" max="1000000" step="1" value="1" required></label>
-      <label>Item ingredients per batch (chaos)<input id="recipe_item_cost" type="number" min="0" step="0.01" placeholder="Enter total ingredient cost" required></label>
     </form>
     <p id="recipe_requirements"></p><p id="recipe_result" aria-live="polite"></p>
     <details class="method"><summary>Full recipe catalogue and sources</summary><p id="recipe_rules"></p><div class="table-wrap"><table><thead><tr><th>Recipe</th><th>Currency inputs → outputs</th><th>Requirements and access</th><th>Status / source</th></tr></thead><tbody id="recipe_catalogue"></tbody></table></div></details>
@@ -51,11 +50,11 @@
     <p>Cycle profit uses your starting amount, applies the selected haircut at every market trade, and rounds each output down to a whole unit. This is a synthetic unit-fill model; hourly averages do not reveal actual order lot sizes. Vendor batches are rounded down before multiplying their exact reward, with no haircut. Unspent vendor inputs and intermediate remainders are excluded from the ending amount.</p>
     <p>The historical range multiplies the lowest and highest observed pair rates. It is a scenario range before rounding and haircut, not a confidence interval or a guaranteed bound on future returns. Its extrema may have occurred at different times.</p>
     <p>The volume filter requires both currencies in every market pair to have traded at least the entered amount during that hour. Counts in different currencies are not directly comparable. Historical stock is shown only as context and is never treated as current liquidity. Gold costs are unavailable here and are excluded from profit.</p>
-    <p>Vendor rules are current non-Ruthless rules applied to the historical market snapshot, not a reconstruction of old patch rules. Vendors are disabled for Ruthless leagues. Only quoted currencies are added to the graph; item baskets are evaluated separately. Random rewards and retired recipes are excluded from profit estimates. Faustus exchange trades already appear in the market feed.</p>
+    <p>Vendor rules are current non-Ruthless rules applied to the historical market snapshot, not a reconstruction of old patch rules. Vendors are disabled for Ruthless leagues. Only quoted currencies are added to the graph; currency baskets are evaluated separately. Faustus exchange trades already appear in the market feed.</p>
     <p>Only pairs with both item IDs under GGG’s Currency category are scanned. Market cycles have three trades; routes with a vendor have two to four trades. Cycles are deduplicated by rotation; the reverse direction remains separate. Unknown currency names display a readable version of their internal identifier.</p>
   </details>
   <footer><p>This product isn't affiliated with or endorsed by Grinding Gear Games in any way.</p><a href="https://github.com/timeolord/poe-arbitrage">Source repository</a></footer>
 </main>
-<script type="module" src="./app.mjs?v=vendors1"></script>
+<script type="module" src="./app.mjs?v=currency-only1"></script>
 </body>
 </html>

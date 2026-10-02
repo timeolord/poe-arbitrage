@@ -128,19 +128,17 @@ function currency_list(values) {
 }
 
 function load_recipes() {
-  const calculable = catalog.recipes.filter(recipe => ['fixed', 'basket', 'item'].includes(recipe.kind));
+  const calculable = catalog.recipes.filter(recipe => ['fixed', 'basket'].includes(recipe.kind));
   by_id('recipe').innerHTML = calculable.map(recipe => `<option value="${escape_html(recipe.id)}">${escape_html(recipe.name)}</option>`).join('');
-  by_id('recipe_count').textContent = `${catalog.recipes.length} documented entries`;
-  by_id('recipe_rules').textContent = `${catalog.ruleset}. Checked ${catalog.checked_at}. Currency-producing recipes are listed; equipment crafting, divination-card rewards and undisclosed recipes are outside this catalogue. Confirm the sell-window reward before using any item recipe.`;
+  by_id('recipe_count').textContent = `${catalog.recipes.length} currency exchanges`;
+  by_id('recipe_rules').textContent = `${catalog.ruleset}. Checked ${catalog.checked_at}. Only deterministic currency-to-currency recipes are listed. Quoted adjacent essence upgrades are also included in the cycle scanner.`;
   by_id('recipe_catalogue').innerHTML = catalog.recipes.map(recipe => `<tr><td>${escape_html(recipe.name)}</td><td>${Object.keys(recipe.outputs).length ? escape_html(currency_list(recipe.inputs) + ' → ' + currency_list(recipe.outputs)) : 'Variable or unavailable'}</td><td>${escape_html(recipe.requirements)}<span class="secondary">${escape_html(recipe.vendor)}</span></td><td>${escape_html(recipe.kind)}<span class="secondary"><a href="${escape_html(recipe.source)}" target="_blank" rel="noreferrer">Source</a></span></td></tr>`).join('');
   select_recipe();
 }
 
 function select_recipe() {
   if (!catalog) return;
-  const recipe = catalog.recipes.find(recipe => recipe.id === by_id('recipe').value);
-  by_id('recipe_item_cost').value = recipe.kind === 'item' ? '' : '0';
-  by_id('recipe_item_cost').disabled = recipe.kind !== 'item';
+
   render_recipe();
 }
 
@@ -150,9 +148,9 @@ function render_recipe() {
   by_id('recipe_requirements').textContent = `${currency_list(recipe.inputs)} → ${currency_list(recipe.outputs)}. ${recipe.requirements} Vendor: ${recipe.vendor}.`;
   try {
     if (by_id('league').value.includes('Ruthless')) throw new Error('This catalogue is for non-Ruthless rules.');
-    if (!by_id('recipe_controls').checkValidity()) throw new Error('Enter the total item ingredient cost per batch, including gems, fragments or equipment.');
+    if (!by_id('recipe_controls').checkValidity()) throw new Error('Enter a valid whole number of batches.');
     const league = analysis.leagues.find(league => league.name === by_id('league').value);
-    const result = quote_recipe(recipe, league.edges ?? [], Number(by_id('recipe_batches').value), Number(by_id('recipe_item_cost').value), read_options().haircut_bps);
+    const result = quote_recipe(recipe, league.edges ?? [], Number(by_id('recipe_batches').value), 0, read_options().haircut_bps);
     by_id('recipe_result').textContent = `Cost: ${format_number(result.cost)} chaos. Return: ${format_number(result.returned)} chaos. Profit: ${format_number(result.profit)} chaos (${result.profit_pct === null ? 'percentage undefined for zero cost' : format_pct(result.profit_pct)}). Direct historical market quotes with haircut and whole-unit rounding; gold and time excluded.`;
     by_id('recipe_result').className = result.profit >= 0 ? 'positive' : 'negative';
   } catch (error) {
@@ -163,7 +161,7 @@ function render_recipe() {
 
 by_id('recipe_controls').addEventListener('submit', event => event.preventDefault());
 by_id('recipe').addEventListener('change', select_recipe);
-for (const id of ['recipe_batches', 'recipe_item_cost']) by_id(id).addEventListener('input', render_recipe);
+for (const id of ['recipe_batches']) by_id(id).addEventListener('input', render_recipe);
 by_id('controls').addEventListener('submit', event => event.preventDefault());
 by_id('league').addEventListener('change', () => {update_currencies(); render();});
 for (const id of ['start', 'budget', 'haircut', 'min_profit', 'min_volume', 'route_type']) by_id(id).addEventListener('input', render);
