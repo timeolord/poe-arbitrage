@@ -119,6 +119,34 @@ export function apply_market_quotes(league, quotes) {
   return {...league, edges:league.edges.map(edge => edge.kind === 'market' ? overrides.get(`${edge.from}>${edge.to}`) ?? edge : edge)};
 }
 
+export const pair_key = pair => `${pair.from}>${pair.to}`;
+
+export function apply_pair_quotes(league, quotes) {
+  const overrides = new Map();
+  for (const quote of quotes) {
+    const key = pair_key(quote);
+    if (overrides.has(key)) throw new Error('Duplicate manual market quote.');
+    const edge = league.edges.find(edge => edge.kind === 'market' && pair_key(edge) === key);
+    if (!edge) throw new Error('No historical market pair for this quote.');
+    overrides.set(key, {...quoted_edge(edge, quote), manual_price:true, historical_input_volume:historical_volume(edge, 'input'), historical_output_volume:historical_volume(edge, 'output')});
+  }
+  return {...league, edges:league.edges.map(edge => edge.kind === 'market' ? overrides.get(pair_key(edge)) ?? edge : edge)};
+}
+
+export function shared_cycle_quotes(league, saved, legs, quotes) {
+  if (!Array.isArray(quotes) || quotes.length !== legs.length) throw new Error('Enter a quote for each trade.');
+  const merged = new Map(saved.map(quote => [pair_key(quote), quote]));
+  legs.forEach((leg, i) => {
+    if (leg.kind === 'vendor') return;
+    const adjusted = quoted_edge(leg, quotes[i]);
+    if (BigInt(adjusted.input_volume) * BigInt(leg.output_volume) === BigInt(leg.input_volume) * BigInt(adjusted.output_volume)) return;
+    merged.set(pair_key(leg), {from:leg.from, to:leg.to, input:quotes[i].input, output:quotes[i].output});
+  });
+  const result = [...merged.values()];
+  apply_pair_quotes(league, result);
+  return result;
+}
+
 export function manual_cycle(legs, quotes, budget, haircut_bps, fees = null) {
   if (!Array.isArray(quotes) || quotes.length !== legs.length) throw new Error('Enter a quote for each trade.');
   const adjusted = legs.map((leg, i) => {

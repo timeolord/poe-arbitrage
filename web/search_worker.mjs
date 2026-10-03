@@ -1,4 +1,4 @@
-import {search_cycles} from './core.mjs?v=chaos-prices-v1';
+import {search_cycles} from './core.mjs?v=shared-quotes-v1';
 
 self.onmessage = ({data}) => {
   try {
