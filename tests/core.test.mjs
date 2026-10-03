@@ -315,3 +315,40 @@ test('panel rejects partial, invalid, duplicate and absent quotes atomically', a
   assert.throws(()=>apply_market_quotes(league,[{currency:'unknown'}]),/common/);
   assert.deepEqual(league,original);
 });
+
+test('shared inspector quotes update every affected cycle and preserve other directions', async () => {
+  const {shared_cycle_quotes,apply_pair_quotes,search_cycles} = await import('../web/core.mjs');
+  const edge = (from,to,x,y,kind='market')=>({...leg(from,to,x,y),kind,rate:y/x,low_rate:y/x,high_rate:y/x});
+  const league = {edges:[edge('a','b',100,200),edge('b','a',200,100),edge('b','c',100,100),edge('c','a',100,100),edge('b','d',3,4,'vendor'),edge('d','a',100,100)]};
+  const original = structuredClone(league);
+  const saved = [{from:'c',to:'a',input:'1',output:'1.1'}];
+  const edited = [league.edges[0],league.edges[2],league.edges[3]];
+  const quotes = [{input:'1',output:'3'}, {input:'1',output:'1'}, {input:'1',output:'1'}];
+  const shared = shared_cycle_quotes(league,saved,edited,quotes);
+  assert.equal(shared.length,2);
+  const adjusted = apply_pair_quotes(league,shared);
+  const options = {start:'a',budget:100,haircut_bps:0,min_volume:50,min_stock:1,min_profit:0,max_trades:3};
+  const cycles = search_cycles(adjusted,options).cycles;
+  assert.equal(cycles.find(c=>c.path.join() === 'a,b').simulation.profit,50);
+  assert.equal(cycles.find(c=>c.path.join() === 'a,b,c').simulation.profit,230);
+  assert.equal(cycles.find(c=>c.path.join() === 'a,b,d').simulation.profit,300);
+  assert.deepEqual(adjusted.edges[1],league.edges[1]);
+  assert.deepEqual(adjusted.edges[4],league.edges[4]);
+  assert.deepEqual(league,original);
+  assert.equal(search_cycles(adjusted,{...options,min_volume:101}).cycles.length,0);
+  const loss = shared_cycle_quotes(league,shared,[adjusted.edges[0]],[{input:'1',output:'0.1'}]);
+  assert.equal(search_cycles(apply_pair_quotes(league,loss),options).cycles.length,0);
+});
+
+test('sharing unchanged ratios adds no overrides and rejects invalid edits atomically', async () => {
+  const {shared_cycle_quotes,apply_pair_quotes} = await import('../web/core.mjs');
+  const legs = [{...leg('a','b',100,200),kind:'market'},{...leg('b','a',3,4),kind:'vendor'}];
+  const league = {edges:legs};
+  const saved = [{from:'a',to:'b',input:'1',output:'3'}];
+  assert.deepEqual(shared_cycle_quotes(league,[],legs,[{input:'1',output:'2'},null]),[]);
+  assert.deepEqual(shared_cycle_quotes(league,saved,legs,[{input:'1',output:'2'},null]),saved);
+  assert.throws(()=>shared_cycle_quotes(league,saved,legs,[{input:'0',output:'2'},null]),/Quote/);
+  assert.deepEqual(saved,[{from:'a',to:'b',input:'1',output:'3'}]);
+  assert.throws(()=>apply_pair_quotes(league,[{from:'b',to:'a',input:'1',output:'2'}]),/market pair/);
+  assert.throws(()=>apply_pair_quotes(league,[...saved,...saved]),/Duplicate/);
+});
