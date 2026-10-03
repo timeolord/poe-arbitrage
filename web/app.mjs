@@ -1,4 +1,4 @@
-import {currency_name, search_cycles, quote_recipe, manual_cycle, apply_market_quotes, common_currencies, chaos_id, historical_volume} from './core.mjs?v=chaos-prices-v1';
+import {currency_name, search_cycles, quote_recipe, manual_cycle, apply_market_quotes, common_currencies, chaos_id, historical_volume, apply_pair_quotes, shared_cycle_quotes, pair_key} from './core.mjs?v=shared-quotes-v1';
 
 const by_id = id => document.getElementById(id);
 const format_number = value => new Intl.NumberFormat(undefined, {maximumFractionDigits: 2}).format(value);
@@ -19,17 +19,17 @@ const market_quotes = new Map();
 
 function current_league() {
   const league = analysis.leagues.find(league => league.name === by_id('league').value);
-  return apply_market_quotes(league, market_quotes.get(league.name) ?? []);
+  return apply_pair_quotes(league, market_quotes.get(league.name) ?? []);
 }
 
 function render_market_quotes() {
   const league = analysis.leagues.find(league => league.name === by_id('league').value);
   const saved = market_quotes.get(league.name) ?? [];
   by_id('market_quote_rows').innerHTML = common_currencies.filter(id => league.currencies.includes(id)).map(id => {
-    const quote = saved.find(quote => quote.currency === id);
+    const quote = direction => saved.find(quote => quote.from === (direction === 'buy' ? chaos_id : id) && quote.to === (direction === 'buy' ? id : chaos_id));
     return `<tr><td>${escape_html(currency_name(id))}</td>${['buy', 'sell'].map(direction => {
       const edge = league.edges.find(edge => edge.kind === 'market' && edge.from === (direction === 'buy' ? chaos_id : id) && edge.to === (direction === 'buy' ? id : chaos_id));
-      return ['input', 'output'].map(side => `<td><input type="text" inputmode="decimal" data-currency="${escape_html(id)}" data-direction="${direction}" data-side="${side}" aria-label="${escape_html(currency_name(id))} ${direction} ${side === 'input' ? 'give' : 'receive'}" value="${escape_html(quote?.[direction]?.[side] ?? '')}" placeholder="${edge ? format_number(edge[`${side}_volume`]) : 'No pair'}" ${edge ? '' : 'disabled'}></td>`).join('');
+      return ['input', 'output'].map(side => `<td><input type="text" inputmode="decimal" data-currency="${escape_html(id)}" data-direction="${direction}" data-side="${side}" aria-label="${escape_html(currency_name(id))} ${direction} ${side === 'input' ? 'give' : 'receive'}" value="${escape_html(quote(direction)?.[side] ?? '')}" placeholder="${edge ? format_number(edge[`${side}_volume`]) : 'No pair'}" ${edge ? '' : 'disabled'}></td>`).join('');
     }).join('')}</tr>`;
   }).join('');
   by_id('market_quote_error').hidden = true;
@@ -38,7 +38,7 @@ function render_market_quotes() {
 
 function update_quote_status(pending = false) {
   const count = current_league().edges.filter(edge => edge.manual_price).length;
-  by_id('market_quote_status').textContent = `${count ? `Search uses ${count} manual directional Chaos quotes; other rates are historical.` : 'Search uses historical prices.'}${pending ? ' Edits pending. Apply prices and search to use them.' : ''}`;
+  by_id('market_quote_status').textContent = `${count ? `Search uses ${count} manual directional market quotes; other rates are historical.` : 'Search uses historical prices.'}${pending ? ' Edits pending. Apply prices and search to use them.' : ''}`;
 }
 
 
@@ -83,17 +83,17 @@ function render_rows() {
   by_id('result_count').textContent = `${Math.min(page_size, ranked.length)} of ${ranked.length} matching cycles`;
 }
 
-function show_details(index, quotes = null) {
+function show_details(index, inspected = null) {
   selected_index = index;
-  const historical = ranked[index];
+  const historical = inspected ?? ranked[index];
   const options = read_options();
-  const cycle = quotes ? {...historical, ...manual_cycle(historical.legs, quotes, options.budget, options.haircut_bps, fee_catalog.items)} : historical;
-  const displayed_quotes = quotes ?? historical.legs.map(leg => ({input:String(leg.input_volume), output:String(leg.output_volume)}));
+  const cycle = historical;
+  const displayed_quotes = historical.legs.map(leg => ({input:String(leg.input_volume), output:String(leg.output_volume)}));
   by_id('details').hidden = false;
   by_id('detail_content').innerHTML = `${route_html(cycle.path)}
-    <form id="leg_quotes"><div class="quote-editor"><h3>Check current prices</h3><p>Enter the amounts you give and receive for each market trade. Vendor batches stay fixed. Recalculate uses your starting amount and haircut, with whole-unit rounding and updated gold fees.</p>
+    <form id="leg_quotes"><div class="quote-editor"><h3>Check current prices</h3><p>Enter the amounts you give and receive for each market trade. Vendor batches stay fixed. Recalculate applies edited pairs to every cycle and recipe in this league, then searches again with your starting amount and haircut. Buying and selling remain separate. Vendor batches stay fixed.</p>
     ${historical.legs.map((leg, i) => leg.kind === 'vendor' ? `<p>Trade ${i + 1}: fixed vendor batch, ${format_number(leg.input_volume)} ${escape_html(currency_name(leg.from))} → ${format_number(leg.output_volume)} ${escape_html(currency_name(leg.to))}.</p>` : `<div class="quote-row"><span>Trade ${i + 1}</span><label>Give ${escape_html(currency_name(leg.from))}<input data-quote-input="${i}" aria-label="Trade ${i + 1} give ${escape_html(currency_name(leg.from))}" type="text" inputmode="decimal" value="${escape_html(displayed_quotes[i].input)}" required></label><label>Receive ${escape_html(currency_name(leg.to))}<input data-quote-output="${i}" aria-label="Trade ${i + 1} receive ${escape_html(currency_name(leg.to))}" type="text" inputmode="decimal" value="${escape_html(displayed_quotes[i].output)}" required></label></div>`).join('')}
-    <div class="quote-actions"><button type="submit">Recalculate cycle</button><button id="reset_quotes" type="button">Reset to search rates</button></div><p id="quote_status" role="status">${quotes ? 'Manual price scenario. Historical stock and volume remain context; the search results above use the applied panel prices.' : 'Search price scenario. Change the quote amounts, then recalculate.'}</p><p id="quote_error" class="error" role="alert" hidden></p></div></form>
+    <div class="quote-actions"><button type="submit">Recalculate cycle</button><button id="reset_quotes" type="button">Reset these pairs to historical</button></div><p id="quote_status" role="status">${index < 0 ? 'This cycle no longer matches the search filters. Its recalculated amounts remain below.' : 'These rates are shared with the search results. Change quote amounts, then recalculate.'}</p><p id="quote_error" class="error" role="alert" hidden></p></div></form>
     <div class="detail-stats">
     <div><span>Modeled cycle profit</span><strong class="${cycle.simulation.profit_pct >= 0 ? 'positive' : 'negative'}">${format_pct(cycle.simulation.profit_pct)}</strong></div>
     <div><span>Unrounded central return</span><strong>${format_pct(cycle.profit_pct)}</strong></div>
@@ -109,7 +109,7 @@ function show_details(index, quotes = null) {
       <td>${format_number(cycle.simulation.amounts[i])} → ${format_number(cycle.simulation.amounts[i + 1])}${cycle.simulation.leftovers[i] ? `<span class="secondary">${cycle.simulation.leftovers[i]} input left over, excluded</span>` : ''}</td>
       <td>${format_number(cycle.simulation.clicks.leg_counts[i])}<span class="secondary">${leg.kind === 'vendor' ? 'One click per completed batch' : 'One Faustus trade'}</span></td>
       <td>${format_gold(cycle.simulation.gold.leg_costs[i])}<span class="secondary">${leg.kind === 'vendor' ? 'No exchange fee' : 'Fee on received currency'}</span></td>
-      <td>${leg.rate.toPrecision(6)} per input unit<span class="secondary">${(quotes || leg.manual_price) && leg.kind !== 'vendor' ? 'Manual quote' : leg.kind === 'vendor' ? 'Fixed vendor rate' : 'Historical average'}; historical ${leg.low_rate.toPrecision(5)} to ${leg.high_rate.toPrecision(5)}</span></td>
+      <td>${leg.rate.toPrecision(6)} per input unit<span class="secondary">${leg.manual_price && leg.kind !== 'vendor' ? 'Manual quote' : leg.kind === 'vendor' ? 'Fixed vendor rate' : 'Historical average'}; historical ${leg.low_rate.toPrecision(5)} to ${leg.high_rate.toPrecision(5)}</span></td>
       <td>${leg.kind === 'vendor' ? 'Fixed batch: ' : 'Hourly: '}${format_number(historical_volume(historical.legs[i], 'input'))} input / ${format_number(historical_volume(historical.legs[i], 'output'))} output</td>
       <td>${leg.kind === 'vendor' ? 'Vendor, no market stock assumption' : `${format_number(leg.historical_low_stock)} to ${format_number(leg.historical_high_stock)}`}</td></tr>`).join('')}</tbody></table></div>
     <p>Profit per click = profit in the starting currency ÷ total estimated clicks. Each market leg with a nonzero input counts as one Faustus trade. Each completed vendor batch counts as one click, regardless of its reward quantity. Setup, inventory movement and travel are excluded. Manual prices also update vendor batch counts and click efficiency.</p>
@@ -121,14 +121,25 @@ function show_details(index, quotes = null) {
     event.preventDefault();
     try {
       const values = historical.legs.map((leg, i) => leg.kind === 'vendor' ? null : ({input:document.querySelector(`[data-quote-input="${i}"]`).value, output:document.querySelector(`[data-quote-output="${i}"]`).value}));
-      show_details(index, values);
+      const league = analysis.leagues.find(league => league.name === by_id('league').value);
+      const saved = shared_cycle_quotes(league, market_quotes.get(league.name) ?? [], historical.legs, values);
+      manual_cycle(historical.legs, values, options.budget, options.haircut_bps, fee_catalog.items);
+      market_quotes.set(league.name, saved);
+      render_market_quotes();
+      render(historical);
     } catch (error) {by_id('quote_error').hidden = false; by_id('quote_error').textContent = error.message; by_id('quote_status').textContent = 'Invalid quote. The amounts below are from the last successful calculation.';}
   });
-  by_id('reset_quotes').addEventListener('click', () => show_details(index));
+  by_id('reset_quotes').addEventListener('click', () => {
+    const keys = new Set(historical.legs.filter(leg => leg.kind !== 'vendor').map(pair_key));
+    const league = by_id('league').value;
+    market_quotes.set(league, (market_quotes.get(league) ?? []).filter(quote => !keys.has(pair_key(quote))));
+    render_market_quotes();
+    render(historical);
+  });
   render_rows();
 }
 
-function finish_render(league, result) {
+function finish_render(league, result, inspected = null) {
   ranked = result.cycles;
   update_quote_status();
   by_id('search_status').textContent = result.complete ? `Searched cycles of 2–${by_id('max_trades').value} trades, including the return trade.` : 'Partial results: search limit reached. Lower maximum trades or raise minimum volume. Statistics describe only the cycles found.';
@@ -141,6 +152,13 @@ function finish_render(league, result) {
   const median = ranked.length % 2 ? returns[middle] : (returns[middle - 1] + returns[middle]) / 2;
   by_id('median_return').textContent = ranked.length ? format_pct(median) : '—';
   render_rows();
+  if (inspected) {
+    const signature = cycle => JSON.stringify(cycle.legs.map(leg => [leg.from, leg.to, leg.kind, leg.vendor]));
+    const index = ranked.findIndex(cycle => signature(cycle) === signature(inspected));
+    const legs = inspected.legs.map(leg => leg.kind === 'vendor' ? leg : league.edges.find(edge => edge.kind === 'market' && pair_key(edge) === pair_key(leg)));
+    const updated = {...inspected, ...manual_cycle(legs, legs.map(leg => ({input:String(leg.input_volume), output:String(leg.output_volume)})), read_options().budget, read_options().haircut_bps, fee_catalog.items)};
+    show_details(index, index < 0 ? updated : null);
+  }
 }
 
 function search_error(error) {
@@ -150,7 +168,8 @@ function search_error(error) {
   render_rows();
 }
 
-function render() {
+function render(inspected = null) {
+  if (!inspected?.legs) inspected = null;
   if (!analysis) return;
   search_worker?.terminate();
   search_worker = null;
@@ -169,17 +188,17 @@ function render() {
     by_id('empty').hidden = true;
     by_id('result_count').textContent = 'Searching…';
     if (typeof Worker === 'undefined') {
-      finish_render(league, search_cycles(league, options));
+      finish_render(league, search_cycles(league, options), inspected);
       return;
     }
-    const worker = new Worker('./search_worker.mjs?v=chaos-prices-v1', {type: 'module'});
+    const worker = new Worker('./search_worker.mjs?v=shared-quotes-v1', {type: 'module'});
     search_worker = worker;
     worker.onmessage = ({data}) => {
       if (search_worker !== worker) return;
       worker.terminate();
       search_worker = null;
       if (data.error) search_error(new Error(data.error));
-      else finish_render(league, data);
+      else finish_render(league, data, inspected);
     };
     worker.onerror = () => {
       if (search_worker !== worker) return;
@@ -274,8 +293,13 @@ by_id('market_quotes').addEventListener('submit', event => {
     const quotes = common_currencies.map(currency => ({currency, ...Object.fromEntries(['buy', 'sell'].map(direction => [direction, Object.fromEntries(['input', 'output'].map(side => [side, document.querySelector(`[data-currency="${currency}"][data-direction="${direction}"][data-side="${side}"]`)?.value ?? '']))]))}));
     const league = analysis.leagues.find(league => league.name === by_id('league').value);
     apply_market_quotes(league, quotes);
-    market_quotes.set(league.name, quotes);
-    by_id('market_quote_error').hidden = true;
+    const panel_pairs = new Set(league.edges.filter(edge => edge.kind === 'market' && (edge.from === chaos_id && common_currencies.includes(edge.to) || edge.to === chaos_id && common_currencies.includes(edge.from))).map(pair_key));
+    const remaining = (market_quotes.get(league.name) ?? []).filter(quote => !panel_pairs.has(pair_key(quote)));
+    const values = quotes.flatMap(quote => ['buy', 'sell'].filter(direction => quote[direction].input.trim() || quote[direction].output.trim()).map(direction => ({from:direction === 'buy' ? chaos_id : quote.currency, to:direction === 'buy' ? quote.currency : chaos_id, ...quote[direction]})));
+    const saved = [...remaining, ...values];
+    apply_pair_quotes(league, saved);
+    market_quotes.set(league.name, saved);
+    render_market_quotes();
     render();
   } catch (error) {by_id('market_quote_error').hidden = false; by_id('market_quote_error').textContent = error.message;}
 });

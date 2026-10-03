@@ -6,7 +6,7 @@
   <meta name="description" content="Explore historical Path of Exile currency cycles, estimated profit percentages, and budget calculations using GGG exchange data.">
   <title>PoE Arbitrage</title>
   <link rel="icon" href="./favicon.svg?v=20261002" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css?v=chaos-prices-v1">
+  <link rel="stylesheet" href="./style.css?v=shared-quotes-v1">
 </head>
 <body>
 <main>
@@ -28,7 +28,7 @@
   </form>
   <section class="manual-prices" aria-labelledby="manual_title">
     <details id="manual_panel"><summary id="manual_title">Manual Chaos prices for common currencies</summary>
-      <p>Enter the amounts you give and receive in game. Buying and selling are separate quotes. Leave both fields in a direction blank to keep its historical rate. Only existing market pairs are editable; historical stock and volume filters still apply. Other pairs retain historical prices, and the haircut still applies.</p>
+      <p>Enter the amounts you give and receive in game. Buying and selling are separate quotes. Leave both fields in a direction blank to keep its historical rate. Only existing market pairs are editable; historical stock and volume filters still apply. Unedited pairs retain historical prices, and the haircut still applies.</p>
       <form id="market_quotes"><div class="table-wrap"><table><thead><tr><th>Currency</th><th>Buy: give Chaos</th><th>Buy: receive currency</th><th>Sell: give currency</th><th>Sell: receive Chaos</th></tr></thead><tbody id="market_quote_rows"></tbody></table></div>
         <div class="quote-actions"><button type="submit">Apply prices and search</button><button id="reset_market_quotes" type="button">Reset to historical prices</button></div>
       </form>
@@ -74,6 +74,6 @@
   </details>
   <footer><p>This product isn't affiliated with or endorsed by Grinding Gear Games in any way.</p><a href="https://github.com/timeolord/poe-arbitrage">Source repository</a></footer>
 </main>
-<script type="module" src="./app.mjs?v=chaos-prices-v1"></script>
+<script type="module" src="./app.mjs?v=shared-quotes-v1"></script>
 </body>
 </html>
